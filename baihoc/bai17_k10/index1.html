@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 17: Biến và Lệnh gán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Chống bấm chuột phải và các thao tác can thiệp video */
+        .video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 90%; z-index: 10; cursor: default; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans p-2 md:p-10">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-t-8 border-blue-700 relative">
+        <div class="p-4 text-center">
+            <h1 class="text-xl md:text-2xl font-black text-blue-900 uppercase">BÀI 17: BIẾN VÀ LỆNH GÁN</h1>
+            <p id="status-msg" class="text-red-500 font-bold text-xs mt-1">Hệ thống đang theo dõi quá trình học của bạn...</p>
+        </div>
+
+        <div class="relative aspect-video bg-black">
+            <div id="player"></div>
+            <div class="video-overlay"></div>
+        </div>
+
+        <div id="quiz-container" class="hidden absolute inset-0 z-50 bg-blue-900/95 flex items-center justify-center p-6">
+            <div class="bg-white p-8 rounded-2xl max-w-lg w-full shadow-2xl">
+                <h3 id="question-text" class="text-lg font-black text-blue-900 mb-4 uppercase">ĐANG TẢI CÂU HỎI...</h3>
+                <div id="options" class="space-y-3">
+                    </div>
+                <p id="feedback" class="mt-4 text-sm font-bold hidden"></p>
+            </div>
+        </div>
+
+        <div id="finish-section" class="hidden p-10 text-center bg-green-50">
+            <h2 class="text-xl font-black text-green-700 uppercase mb-4">🎉 Tuyệt vời! Bạn đã hoàn thành bài học</h2>
+            <a href="LINK_BAI_TAP_CUA_BAN" class="inline-block bg-blue-700 text-white font-black py-4 px-10 rounded-2xl shadow-xl">TIẾP TỤC LÀM BÀI TẬP →</a>
+        </div>
+    </div>
+
+    <script>
+        // 1. Khởi tạo YouTube API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var quizPoints = [
+            { 
+                time: 45, 
+                retryTime: 3, 
+                question: "Trong Python, lệnh nào sau đây là lệnh gán đúng?",
+                options: ["x = 5", "5 = x", "x : 5", "gán x bằng 5"],
+                answer: 0 
+            },
+            { 
+                time: 68, 
+                retryTime: 46, 
+                question: "Tên biến nào sau đây là HỢP LỆ trong Python?",
+                options: ["10tin_hoc", "tin hoc", "tin_hoc_10", "if"],
+                answer: 2 
+            }
+        ];
+        var currentQuizIndex = 0;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: 'YytWVMRwtNQ',
+                playerVars: {
+                    'controls': 0,      // Ẩn bộ điều khiển để chống tua
+                    'disablekb': 1,    // Chặn phím tắt
+                    'rel': 0,
+                    'modestbranding': 1
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // 2. Theo dõi thời gian thực của video
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                var checkTime = setInterval(function() {
+                    if (currentQuizIndex < quizPoints.length) {
+                        var point = quizPoints[currentQuizIndex];
+                        if (player.getCurrentTime() >= point.time) {
+                            clearInterval(checkTime);
+                            showQuiz(point);
+                        }
+                    } else if (player.getCurrentTime() >= player.getDuration() - 1) {
+                        document.getElementById('finish-section').classList.remove('hidden');
+                        document.getElementById('status-msg').innerText = "Hoàn thành!";
+                        clearInterval(checkTime);
+                    }
+                }, 500);
+            }
+        }
+
+        // 3. Hiển thị câu hỏi
+        function showQuiz(point) {
+            player.pauseVideo();
+            const container = document.getElementById('quiz-container');
+            const qText = document.getElementById('question-text');
+            const optionsDiv = document.getElementById('options');
+            
+            qText.innerText = point.question;
+            optionsDiv.innerHTML = "";
+            container.classList.remove('hidden');
+
+            point.options.forEach((opt, index) => {
+                let btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 border-2 border-gray-200 rounded-xl font-bold hover:bg-blue-50 transition";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index, point);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        // 4. Kiểm tra đáp án
+        function checkAnswer(selectedIndex, point) {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('hidden');
+
+            if (selectedIndex === point.answer) {
+                feedback.innerText = "✅ CHÍNH XÁC! Bạn có thể xem tiếp.";
+                feedback.className = "mt-4 text-sm font-bold text-green-600";
+                setTimeout(() => {
+                    document.getElementById('quiz-container').classList.add('hidden');
+                    feedback.classList.add('hidden');
+                    currentQuizIndex++;
+                    player.playVideo();
+                }, 1500);
+            } else {
+                feedback.innerText = "❌ SAI RỒI! Bạn phải quay lại xem kỹ phần này.";
+                feedback.className = "mt-4 text-sm font-bold text-red-600";
+                setTimeout(() => {
+                    document.getElementById('quiz-container').classList.add('hidden');
+                    feedback.classList.add('hidden');
+                    player.seekTo(point.retryTime); // Quay lại vị trí yêu cầu
+                    player.playVideo();
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>
