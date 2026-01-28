@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Nền Tảng Học Tập Module</title>
+ <script src="/_sdk/element_sdk.js"></script>
+ <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100%;
+      overflow: hidden;
+    }
+    html { height: 100%; }
+    .app-container { display: flex; flex-direction: column; height: 100%; width: 100%; }
+
+    /* Header */
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    
+    .app-title-static {
+      color: #ff0000; 
+      font-size: 42px; 
+      font-weight: 900;
+      margin: 0 0 15px 0;
+      text-transform: uppercase;
+    }
+
+    /* Menu nút bấm */
+    .game-menu { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .game-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; border: none; padding: 10px 20px; border-radius: 25px;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2); display: none;
+    }
+    .game-button.visible { display: inline-block; }
+    .game-button.active { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 0 20px rgba(245, 87, 108, 0.5); }
+
+    /* Khu vực hiển thị nội dung */
+    .content-area { flex: 1; display: flex; padding: 20px; overflow: hidden; justify-content: center; }
+    
+    .welcome-screen { 
+      flex: 0 1 80%; 
+      max-height: 90%;
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      background: rgba(255, 255, 255, 0.9); 
+      border-radius: 20px; 
+      overflow: hidden; 
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .welcome-image { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: contain; 
+      display: none; 
+    }
+    .no-image-placeholder { 
+      color: #999; 
+      font-size: 18px; 
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Game Containers */
+    .game-container { flex: 1; display: none; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    .game-container.active { display: flex; flex-direction: column; }
+    .game-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .game-title { font-size: 20px; font-weight: bold; margin: 0; }
+    .close-game-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 14px; border-radius: 12px; cursor: pointer; }
+    .game-frame { flex: 1; border: none; width: 100%; background: white; }
+    .no-url-message { flex: 1; display: flex; align-items: center; justify-content: center; color: #999; font-size: 18px; }
+
+    /* NÚT QUAY LẠI TRANG CHỦ - NỀN MÀU XANH DƯƠNG */
+    .btn-back-home {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 9999;
+      background: #0056b3; /* Đã đổi sang màu xanh dương */
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      font-family: Arial, sans-serif;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.3s ease;
+    }
+    .btn-back-home:hover {
+      background: #004494; /* Màu đậm hơn khi di chuột qua */
+      transform: scale(1.05);
+    }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+
+  <a href="../../index.html" class="btn-back-home">🏠 TRANG CHỦ</a>
+
+  <div class="app-container">
+   <header class="header">
+    <h1 id="app-title" class="app-title-static">🎓 BÀI 19: CÂU LỆNH RẼ NHÁNH IF</h1>
+    <nav class="game-menu" id="game-menu"></nav>
+   </header>
+   <main class="content-area">
+    <div class="welcome-screen" id="welcome-screen">
+      <img id="welcome-img" class="welcome-image" src="" alt="Welcome Background">
+      <div id="image-placeholder" class="no-image-placeholder">
+        🖼️ <b>Ảnh đại diện bài học</b><br>
+        Đang tìm file tại: <b>assets/welcome_bg.jpg</b>
+      </div>
+    </div>
+
+    <div class="game-container" id="game-1">
+      <div class="game-header"><h3 class="game-title" id="title-1"></h3><button onclick="closeGame()" class="close-game-btn">✕ Đóng</button></div>
+      <iframe class="game-frame" id="frame-1"></iframe>
+      <div class="no-url-message" id="no-url-1">📝 Đang tìm file tại: <b>game1/index.html</b></div>
+    </div>
+    <div class="game-container" id="game-2">
+      <div class="game-header"><h3 class="game-title" id="title-2"></h3><button onclick="closeGame()" class="close-game-btn">✕ Đóng</button></div>
+      <iframe class="game-frame" id="frame-2"></iframe>
+      <div class="no-url-message" id="no-url-2">📝 Đang tìm file tại: <b>game2/index.html</b></div>
+    </div>
+    <div class="game-container" id="game-3">
+      <div class="game-header"><h3 class="game-title" id="title-3"></h3><button onclick="closeGame()" class="close-game-btn">✕ Đóng</button></div>
+      <iframe class="game-frame" id="frame-3"></iframe>
+      <div class="no-url-message" id="no-url-3">📝 Đang tìm file tại: <b>game3/index.html</b></div>
+    </div>
+    <div class="game-container" id="game-4">
+      <div class="game-header"><h3 class="game-title" id="title-4"></h3><button onclick="closeGame()" class="close-game-btn">✕ Đóng</button></div>
+      <iframe class="game-frame" id="frame-4"></iframe>
+      <div class="no-url-message" id="no-url-4">📝 Đang tìm file tại: <b>game4/index.html</b></div>
+    </div>
+    <div class="game-container" id="game-5">
+      <div class="game-header"><h3 class="game-title" id="title-5"></h3><button onclick="closeGame()" class="close-game-btn">✕ Đóng</button></div>
+      <iframe class="game-frame" id="frame-5"></iframe>
+      <div class="no-url-message" id="no-url-5">📝 Đang tìm file tại: <b>game5/index.html</b></div>
+    </div>
+   </main>
+  </div>
+
+  <script>
+    const defaultConfig = {
+      app_title: "🎓 BÀI 19: CÂU LỆNH RẼ NHÁNH IF",
+      welcome_image_url: "assets/welcome_bg.jpg",
+      game1_name: "🔢 KHỞI ĐỘNG", game1_url: "game1/index.html",
+      game2_name: "🔤 BIỂU THỨC LÔGIC", game2_url: "game2/index.html",
+      game3_name: "🧩 LỆNH IF", game3_url: "game3/index.html",
+      game4_name: "🎨 LUYỆN TẬP - VẬN DỤNG", game4_url: "game4/index.html",
+      game5_name: "🏠 BÀI TẬP VỀ NHÀ", game5_url: "game5/index.html",
+      primary_color: "#ff0000", secondary_color: "#764ba2"
+    };
+
+    function main() {
+      initializeSDK();
+      updateUI(defaultConfig);
+    }
+
+    function initializeSDK() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig: defaultConfig,
+          onConfigChange: async (config) => { updateUI(config); },
+          mapToEditPanelValues: (config) => {
+            const params = new Map([
+              ["app_title", config.app_title],
+              ["Link Ảnh Nền Chào Mừng", config.welcome_image_url]
+            ]);
+            for(let i=1; i<=5; i++) {
+              params.set(`game${i}_name`, config[`game${i}_name`]);
+              params.set(`game${i}_url`, config[`game${i}_url`]);
+            }
+            return params;
+          }
+        });
+      }
+    }
+
+    function updateUI(config) {
+      const titleEl = document.getElementById('app-title');
+      titleEl.textContent = config.app_title || defaultConfig.app_title;
+      
+      const img = document.getElementById('welcome-img');
+      const placeholder = document.getElementById('image-placeholder');
+      
+      const url = config["Link Ảnh Nền Chào Mừng"] || config.welcome_image_url;
+      if (url) {
+        img.src = url; 
+        img.style.display = 'block'; 
+        placeholder.style.display = 'none';
+        img.onerror = function() {
+           img.style.display = 'none';
+           placeholder.style.display = 'block';
+        };
+      }
+
+      titleEl.style.color = "#ff0000"; 
+      document.body.style.background = `linear-gradient(135deg, ${config.primary_color || defaultConfig.primary_color} 0%, ${config.secondary_color || defaultConfig.secondary_color} 100%)`;
+      
+      updateMenu(config);
+      for (let i = 1; i <= 5; i++) {
+        const name = config[`game${i}_name`] || defaultConfig[`game${i}_name`];
+        const titleElGame = document.getElementById(`title-${i}`);
+        if(titleElGame) titleElGame.textContent = name;
+      }
+    }
+
+    function updateMenu(config) {
+      const menu = document.getElementById('game-menu');
+      menu.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const name = config[`game${i}_name`] || defaultConfig[`game${i}_name`];
+        if (name && name.trim() !== '') {
+          const btn = document.createElement('button');
+          btn.className = 'game-button visible';
+          btn.textContent = name;
+          btn.onclick = () => loadGame(i, config);
+          btn.setAttribute('data-game-id', i);
+          menu.appendChild(btn);
+        }
+      }
+    }
+
+    function loadGame(gameId, config) {
+      document.getElementById('welcome-screen').style.display = 'none';
+      document.querySelectorAll('.game-container').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.game-button').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.querySelector(`[data-game-id="${gameId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+      
+      const container = document.getElementById(`game-${gameId}`);
+      const frame = document.getElementById(`frame-${gameId}`);
+      const noUrl = document.getElementById(`no-url-${gameId}`);
+      
+      const url = config[`game${gameId}_url`] || defaultConfig[`game${gameId}_url` || ""];
+
+      container.classList.add('active');
+      if (url && url.trim() !== "") {
+        frame.style.display = 'block'; noUrl.style.display = 'none';
+        if (frame.src !== url) frame.src = url;
+      } else {
+        frame.style.display = 'none'; noUrl.style.display = 'flex';
+      }
+    }
+
+    function closeGame() {
+      document.querySelectorAll('.game-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('welcome-screen').style.display = 'flex';
+      document.querySelectorAll('.game-button').forEach(b => b.classList.remove('active'));
+    }
+    window.onload = main;
+  </script>
+ </body>
+</html>

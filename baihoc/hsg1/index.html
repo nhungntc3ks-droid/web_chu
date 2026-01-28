@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mô Phỏng Tìm Kiếm Nhị Phân</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    /* ... Giữ nguyên toàn bộ phần CSS của bạn ... */
+    body { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+    html, body, .app-container { height: 100%; width: 100%; }
+    .app-container { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .main-title { font-size: 42px; font-weight: bold; color: #ffffff; text-shadow: 3px 3px 8px rgba(0,0,0,0.4); margin: 0 0 10px 0; }
+    .subtitle { font-size: 18px; color: #f0f0f0; margin: 0; }
+    .control-panel { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .input-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .input-box { flex: 1; min-width: 150px; }
+    .input-label { display: block; font-weight: bold; color: #333; margin-bottom: 5px; font-size: 14px; }
+    .input-field { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #667eea; border-radius: 8px; box-sizing: border-box; }
+    .button-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn { flex: 1; min-width: 120px; padding: 12px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-secondary { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+    .btn-success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: white; }
+    .visualization-area { background: white; border-radius: 15px; padding: 30px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); min-height: 300px; }
+    .array-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+    .array-item { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; border-radius: 50%; background: linear-gradient(145deg, #f0f0f0, #ffffff); box-shadow: 8px 8px 16px #c5c5c5, -8px -8px 16px #ffffff; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: relative; border: 3px solid #e0e0e0; }
+    .array-item.active { background: linear-gradient(145deg, #764ba2, #667eea); color: white; transform: scale(1.2) translateY(-8px); border-color: #8a5ec2; }
+    .array-item.found { background: linear-gradient(145deg, #8fd3f4, #84fab0); color: white; animation: pulse 0.6s infinite; border-color: #6de9a8; }
+    .array-item.excluded { opacity: 0.3; background: linear-gradient(145deg, #ff6b6b, #ee5a6f); }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    .info-panel { background: #f7f7f7; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    .info-row { display: flex; justify-content: space-around; gap: 20px; margin-bottom: 15px; flex-wrap: wrap; }
+    .info-item { text-align: center; flex: 1; min-width: 100px; }
+    .info-value { font-size: 24px; font-weight: bold; color: #667eea; }
+    .code-panel { background: #2d2d2d; border-radius: 10px; padding: 20px; color: #f8f8f2; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.8; overflow-x: auto; }
+    .message-box { padding: 15px; border-radius: 10px; margin-top: 15px; font-size: 16px; text-align: center; font-weight: bold; }
+    .message-success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: white; }
+    .message-error { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; }
+    .message-info { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); color: white; }
+  </style>
+ </head>
+ <body>
+
+  <audio id="snd-step" src="step.mp3"></audio> <audio id="snd-found" src="success.mp3"></audio> <audio id="snd-notfound" src="fail.mp3"></audio> <audio id="snd-click" src="click.mp3"></audio> <main class="app-container">
+   <header class="header">
+    <h1 class="main-title" id="mainTitle">🔍 Mô Phỏng Tìm Kiếm Nhị Phân</h1>
+    <p class="subtitle" id="subtitle">Thuật toán Binary Search với hiệu ứng trực quan</p>
+   </header>
+   <div class="control-panel">
+    <div class="input-group">
+     <div class="input-box"><label for="searchValue" class="input-label">Số cần tìm:</label> <input type="number" id="searchValue" class="input-field" placeholder="Nhập số (1-100)">
+     </div>
+     <div class="input-box"><label for="arraySize" class="input-label">Kích thước mảng:</label> <input type="number" id="arraySize" class="input-field" value="10" min="5" max="15">
+     </div>
+    </div>
+    <div class="button-group">
+        <button class="btn btn-primary" id="searchBtn"> <span id="searchButtonText">🔍 Tìm Kiếm</span> </button> 
+        <button class="btn btn-secondary" id="resetBtn"> <span id="resetButtonText">🔄 Làm Mới</span> </button> 
+        <button class="btn btn-success" id="randomBtn"> <span id="randomButtonText">🎲 Mảng Ngẫu Nhiên</span> </button>
+    </div>
+   </div>
+   <div class="visualization-area">
+    <div class="array-container" id="arrayContainer"></div>
+    <div class="info-panel">
+     <div class="info-row">
+      <div class="info-item"><div class="info-label">Left</div><div class="info-value" id="leftValue">-</div></div>
+      <div class="info-item"><div class="info-label">Mid</div><div class="info-value" id="midValue">-</div></div>
+      <div class="info-item"><div class="info-label">Right</div><div class="info-value" id="rightValue">-</div></div>
+      <div class="info-item"><div class="info-label">Bước</div><div class="info-value" id="stepValue">0</div></div>
+     </div>
+    </div>
+    <div class="code-panel" id="codePanel">
+        <div class="code-line"><span class="keyword">def</span> <span class="variable">binary_search</span>(arr, target):</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">left</span>, <span class="variable">right</span> = <span class="number">0</span>, <span class="keyword">len</span>(arr) - <span class="number">1</span></div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">while</span> <span class="variable">left</span> &lt;= <span class="variable">right</span>:</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">mid</span> = (<span class="variable">left</span> + <span class="variable">right</span>) // <span class="number">2</span></div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> arr[<span class="variable">mid</span>] == <span class="variable">target</span>:</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="variable">mid</span></div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">elif</span> arr[<span class="variable">mid</span>] &lt; <span class="variable">target</span>:</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">left</span> = <span class="variable">mid</span> + <span class="number">1</span></div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">else</span>:</div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">right</span> = <span class="variable">mid</span> - <span class="number">1</span></div>
+        <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> -<span class="number">1</span>
+    </div>
+    <div id="messageBox"></div>
+   </div>
+  </main>
+
+  <script>
+    const defaultConfig = {
+      main_title: "🔍 Mô Phỏng Tìm Kiếm Nhị Phân",
+      subtitle: "Thuật toán Binary Search với hiệu ứng trực quan",
+      search_button_text: "🔍 Tìm Kiếm",
+      reset_button_text: "🔄 Làm Mới",
+      random_button_text: "🎲 Mảng Ngẫu Nhiên",
+      background_color: "#667eea",
+      secondary_color: "#764ba2",
+      text_color: "#ffffff",
+      primary_action_color: "#667eea",
+      secondary_action_color: "#f093fb"
+    };
+
+    let array = [];
+    let isSearching = false;
+
+    // HÀM PHÁT ÂM THANH NỘI BỘ TỪ FILE CỦA BẠN
+    function playCustomSound(id) {
+        const audio = document.getElementById(id);
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("Yêu cầu tương tác người dùng để phát âm thanh"));
+        }
+    }
+
+    function generateArray(size) {
+      array = [];
+      const step = Math.floor(100 / size);
+      for (let i = 0; i < size; i++) {
+        array.push((i + 1) * step + Math.floor(Math.random() * step));
+      }
+      array.sort((a, b) => a - b);
+      renderArray();
+      clearInfo();
+    }
+
+    function renderArray() {
+      const container = document.getElementById('arrayContainer');
+      container.innerHTML = '';
+      array.forEach((value, index) => {
+        const item = document.createElement('div');
+        item.className = 'array-item';
+        item.textContent = value;
+        item.setAttribute('data-index', index);
+        item.id = `item-${index}`;
+        container.appendChild(item);
+      });
+    }
+
+    function clearInfo() {
+      document.getElementById('leftValue').textContent = '-';
+      document.getElementById('midValue').textContent = '-';
+      document.getElementById('rightValue').textContent = '-';
+      document.getElementById('stepValue').textContent = '0';
+      document.getElementById('messageBox').innerHTML = '';
+      document.querySelectorAll('.array-item').forEach(item => {
+        item.classList.remove('active', 'found', 'excluded');
+      });
+    }
+
+    function showMessage(text, type) {
+      const messageBox = document.getElementById('messageBox');
+      messageBox.innerHTML = `<div class="message-box message-${type}">${text}</div>`;
+    }
+
+    async function binarySearch(target) {
+      if (isSearching) return;
+      isSearching = true;
+      clearInfo();
+      document.getElementById('searchBtn').disabled = true;
+      
+      let left = 0;
+      let right = array.length - 1;
+      let step = 0;
+
+      while (left <= right) {
+        step++;
+        const mid = Math.floor((left + right) / 2);
+
+        // Phát âm thanh khi cập nhật chỉ số
+        playCustomSound('snd-step');
+        document.getElementById('leftValue').textContent = left;
+        document.getElementById('midValue').textContent = mid;
+        document.getElementById('rightValue').textContent = right;
+        document.getElementById('stepValue').textContent = step;
+
+        document.querySelectorAll('.array-item').forEach((item, index) => {
+          item.classList.remove('active', 'found');
+          if (index < left || index > right) {
+            item.classList.add('excluded');
+          } else {
+            item.classList.remove('excluded');
+          }
+        });
+
+        await sleep(800);
+        document.getElementById(`item-${mid}`).classList.add('active');
+        await sleep(1000);
+
+        if (array[mid] === target) {
+          document.getElementById(`item-${mid}`).classList.remove('active');
+          document.getElementById(`item-${mid}`).classList.add('found');
+          playCustomSound('snd-found'); // Tìm thấy
+          showMessage(`✅ Tìm thấy ${target} tại vị trí ${mid}!`, 'success');
+          isSearching = false;
+          document.getElementById('searchBtn').disabled = false;
+          return;
+        } else if (array[mid] < target) {
+          playCustomSound('snd-step');
+          showMessage(`${array[mid]} < ${target} → Tìm bên phải`, 'info');
+          left = mid + 1;
+        } else {
+          playCustomSound('snd-step');
+          showMessage(`${array[mid]} > ${target} → Tìm bên trái`, 'info');
+          right = mid - 1;
+        }
+        await sleep(1200);
+      }
+
+      playCustomSound('snd-notfound'); // Không tìm thấy
+      showMessage(`❌ Không tìm thấy ${target}`, 'error');
+      isSearching = false;
+      document.getElementById('searchBtn').disabled = false;
+    }
+
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    // Gán sự kiện Click kèm âm thanh click cho các nút
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      playCustomSound('snd-click');
+      const target = parseInt(document.getElementById('searchValue').value);
+      if (isNaN(target)) { showMessage('⚠️ Nhập số cần tìm!', 'error'); return; }
+      binarySearch(target);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      playCustomSound('snd-click');
+      if (!isSearching) { clearInfo(); document.getElementById('searchValue').value = ''; }
+    });
+
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      playCustomSound('snd-click');
+      if (!isSearching) {
+        const size = parseInt(document.getElementById('arraySize').value) || 10;
+        generateArray(Math.max(5, Math.min(15, size)));
+      }
+    });
+
+    // ... Giữ nguyên phần Element SDK onConfigChange ...
+    async function onConfigChange(config) {
+      const mainTitle = document.getElementById('mainTitle');
+      const subtitle = document.getElementById('subtitle');
+      const appContainer = document.querySelector('.app-container');
+      mainTitle.textContent = config.main_title || defaultConfig.main_title;
+      subtitle.textContent = config.subtitle || defaultConfig.subtitle;
+      appContainer.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, ${config.secondary_color || defaultConfig.secondary_color} 100%)`;
+    }
+    generateArray(10);
+  </script>
+ </body>
+</html>

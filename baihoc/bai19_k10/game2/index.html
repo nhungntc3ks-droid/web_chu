@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò Chơi: Đi Chợ Logic - Bản Chuẩn Xếp Loại</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { overflow: hidden; font-family: 'Segoe UI', sans-serif; cursor: pointer; }
+        .market-bg {
+            background: linear-gradient(to bottom, #87CEEB 0%, #f0fdf4 100%);
+            height: 100vh; position: relative;
+        }
+        .item-container {
+            position: absolute; left: -500px; top: 18%;
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 10; transition: all 1.5s ease-out; 
+        }
+        .item-image { font-size: 140px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2)); }
+        .expression-tag {
+            background: white; padding: 15px 45px; border-radius: 25px;
+            border: 6px solid #7c3aed; font-weight: bold; font-size: 42px;
+            margin-top: -15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        .baskets-area {
+            position: absolute; bottom: 5px; left: 0; width: 100%;
+            display: flex; justify-content: space-between; padding: 0 10%;
+            align-items: flex-end;
+        }
+        .basket-wrapper {
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; transition: transform 0.2s;
+        }
+        .basket-img { font-size: 190px; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3)); }
+        
+        .basket-sticker {
+            position: absolute; top: 65px; padding: 5px 30px;
+            border-radius: 12px; font-size: 38px; font-weight: 900;
+            transform: rotate(-3deg); box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 20; pointer-events: none;
+        }
+        .sticker-true { background: #10b981; color: white; border: 4px solid #064e3b; }
+        .sticker-false { background: #ef4444; color: white; border: 4px solid #7f1d1d; }
+
+        /* Màn hình kết quả */
+        #overlay, #result-screen {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; color: white;
+        }
+        .hidden { display: none !important; }
+
+        #timeSelect { color: #ff0000; background: white; padding: 15px; border-radius: 15px; font-size: 30px; font-weight: bold; margin: 30px 0; border: 5px solid #ff0000; }
+        .timer-display { color: #ff0000; font-size: 55px; font-weight: 900; }
+        
+        .info-bar {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.95); padding: 15px 60px; width: 95%; max-width: 1100px;
+            border-radius: 35px; display: flex; justify-content: space-between; align-items: center;
+            z-index: 50; border: 4px solid #fb923c;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <h1 class="text-7xl font-black mb-6 text-yellow-400">🛒 ĐI CHỢ LOGIC</h1>
+        <p class="text-3xl mb-2">Chọn thời gian chơi:</p>
+        <select id="timeSelect">
+            <option value="180">3 PHÚT</option>
+            <option value="240">4 PHÚT</option>
+            <option value="300">5 PHÚT</option>
+        </select>
+        <button onclick="startGame()" class="bg-blue-600 hover:bg-blue-500 text-white px-20 py-8 rounded-full text-5xl font-black shadow-2xl transition-all">
+            BẮT ĐẦU
+        </button>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 class="text-7xl font-black text-yellow-400 mb-6">TỔNG KẾT</h2>
+        <div id="rank-icon" class="text-[150px] mb-6">🏆</div>
+        <p class="text-5xl font-bold mb-4 text-white">Điểm của em: <span id="final-score" class="text-green-400">0</span></p>
+        <p id="rank-text" class="text-6xl font-black mb-10 uppercase tracking-widest"></p>
+        <button onclick="location.reload()" class="bg-orange-500 hover:bg-orange-400 text-white px-16 py-6 rounded-full text-4xl font-bold shadow-2xl transition-transform active:scale-95">
+            CHƠI LẠI
+        </button>
+    </div>
+
+    <div class="market-bg">
+        <div class="info-bar">
+            <div class="text-4xl font-black text-purple-700 uppercase">Điểm: <span id="score">0</span></div>
+            <div class="timer-display">⏰ <span id="timer">00:00</span></div>
+            <div class="text-4xl font-black text-orange-600 uppercase">Câu: <span id="counter">1/20</span></div>
+        </div>
+
+        <div id="item-lane"></div>
+
+        <div class="baskets-area">
+            <div class="basket-wrapper" onclick="checkAnswer(true)">
+                <div class="basket-sticker sticker-true">TRUE</div>
+                <div class="basket-img">🧺</div>
+            </div>
+            <div class="basket-wrapper" onclick="checkAnswer(false)">
+                <div class="basket-sticker sticker-false">FALSE</div>
+                <div class="basket-img">🧺</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioBg = new Audio('nhac-nen.mp3');
+        const audioCorrect = new Audio('dung.mp3');
+        const audioWrong = new Audio('sai.mp3');
+        const audioBasket = new Audio('bo-vao-gio.mp3');
+        audioBg.loop = true;
+
+        const questions = [
+            { icon: "🥩", exp: "2**3 == 8 and 5 > 2", ans: true },
+            { icon: "🍤", exp: "10 // 3 == 3 or 5 < 2", ans: true },
+            { icon: "🥦", exp: "(4 + 6 == 10) and (9 % 2 == 1)", ans: true },
+            { icon: "🍎", exp: "not (2**2 == 5)", ans: true },
+            { icon: "🐟", exp: "15 // 2 >= 7", ans: true },
+            { icon: "🍊", exp: "3**2 > 5 or 10 == 0", ans: true },
+            { icon: "🍼", exp: "(10 % 3 != 0) and True", ans: true },
+            { icon: "🌽", exp: "7 // 3 == 2 and 2**2 == 4", ans: true },
+            { icon: "🍇", exp: "not False and (5 > 1)", ans: true },
+            { icon: "🍗", exp: "2**4 == 16", ans: true },
+            { icon: "🍌", exp: "2**3 == 6", ans: false },
+            { icon: "🥕", exp: "10 // 4 == 3", ans: false },
+            { icon: "🍉", exp: "(5 + 5 == 10) and (4 % 2 != 0)", ans: false },
+            { icon: "🥩", exp: "3**2 <= 5", ans: false },
+            { icon: "🍅", exp: "not (10 == 10)", ans: false },
+            { icon: "🍐", exp: "False or (8 // 3 == 1)", ans: false },
+            { icon: "🍄", exp: "2**5 == 25", ans: false },
+            { icon: "🥥", exp: "(7 % 2 == 0) or (2 > 5)", ans: false },
+            { icon: "🍍", exp: "10 // 2 != 5", ans: false },
+            { icon: "🍬", exp: "3**2 == 6 and True", ans: false }
+        ];
+
+        let score = 0;
+        let currentIndex = 0;
+        let timeLeft = 0;
+        let gameActive = false;
+        let canClick = false;
+        let timerInterval = null;
+
+        function startGame() {
+            timeLeft = parseInt(document.getElementById('timeSelect').value);
+            document.getElementById('overlay').classList.add('hidden');
+            audioBg.play().catch(() => {});
+            gameActive = true;
+            currentIndex = 0;
+            score = 0;
+            questions.sort(() => Math.random() - 0.5);
+            startTimer();
+            spawnItem();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!gameActive) { clearInterval(timerInterval); return; }
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60);
+                let s = timeLeft % 60;
+                document.getElementById('timer').textContent = `${m}:${s < 10 ? '0'+s : s}`;
+                if (timeLeft <= 0) showResult();
+            }, 1000);
+        }
+
+        function spawnItem() {
+            if (currentIndex >= questions.length) {
+                showResult();
+                return;
+            }
+            const lane = document.getElementById('item-lane');
+            lane.innerHTML = `<div id="active-item" class="item-container">
+                <div class="item-image">${questions[currentIndex].icon}</div>
+                <div class="expression-tag">${questions[currentIndex].exp}</div>
+            </div>`;
+            document.getElementById('counter').textContent = `${currentIndex + 1}/${questions.length}`;
+            
+            setTimeout(() => {
+                const item = document.getElementById('active-item');
+                if(item) {
+                    item.style.left = "calc(50% - 250px)"; 
+                    canClick = true;
+                }
+            }, 100);
+        }
+
+        function checkAnswer(userChoice) {
+            if (!gameActive || !canClick) return;
+            canClick = false; 
+            const isCorrect = userChoice === questions[currentIndex].ans;
+            const item = document.getElementById('active-item');
+
+            if (isCorrect) {
+                score += 10;
+                audioCorrect.play();
+                showFeedback("ĐÚNG RỒI! 🌟", "text-green-600");
+            } else {
+                score -= 5;
+                audioWrong.play();
+                showFeedback("SAI RỒI! ❌", "text-red-600");
+            }
+            document.getElementById('score').textContent = score;
+
+            item.style.transition = "all 0.8s ease-in";
+            item.style.top = "85%";
+            item.style.opacity = "0";
+            item.style.transform = "scale(0.1)";
+            
+            if(userChoice === true) item.style.left = "10%"; 
+            else item.style.left = "80%"; 
+
+            setTimeout(() => { audioBasket.play(); }, 200);
+            setTimeout(() => { 
+                currentIndex++; 
+                if (gameActive) spawnItem(); 
+            }, 1200);
+        }
+
+        function showFeedback(text, colorClass) {
+            const fb = document.createElement('div');
+            fb.className = `absolute top-[40%] left-1/2 -translate-x-1/2 text-8xl font-black ${colorClass} z-[60]`;
+            fb.textContent = text;
+            document.body.appendChild(fb);
+            setTimeout(() => fb.remove(), 1000);
+        }
+
+        function showResult() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            audioBg.pause();
+            
+            const resultScreen = document.getElementById('result-screen');
+            const finalScoreElem = document.getElementById('final-score');
+            const rankTextElem = document.getElementById('rank-text');
+            const rankIconElem = document.getElementById('rank-icon');
+
+            finalScoreElem.textContent = score;
+            resultScreen.classList.remove('hidden');
+
+            if (score >= 180) {
+                rankTextElem.textContent = "XUẤT SẮC";
+                rankIconElem.textContent = "🏆";
+                rankTextElem.style.color = "#FACC15"; 
+            } else if (score >= 140) {
+                rankTextElem.textContent = "GIỎI";
+                rankIconElem.textContent = "🥇";
+                rankTextElem.style.color = "#60A5FA"; 
+            } else if (score >= 100) {
+                rankTextElem.textContent = "KHÁ";
+                rankIconElem.textContent = "🥈";
+                rankTextElem.style.color = "#4ADE80"; 
+            } else {
+                rankTextElem.textContent = "CỐ GẮNG LÊN";
+                rankIconElem.textContent = "⭐️";
+                rankTextElem.style.color = "#9CA3AF"; 
+            }
+        }
+    </script>
+</body>
+</html>

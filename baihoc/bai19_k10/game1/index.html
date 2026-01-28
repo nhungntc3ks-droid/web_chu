@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trò Chơi Học Python</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .game-container {
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .falling-decoration {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.6;
+            animation: fall linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .ball {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            padding: 15px;
+            word-break: break-word;
+            transition: top 0.05s linear;
+        }
+        
+        .ball-knot {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #666 0%, #333 100%);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        
+        .basket {
+            width: 140px;
+            height: 100px;
+            position: absolute;
+            bottom: 150px;
+            left: 30px;
+            transform: translateX(0);
+        }
+        
+        .basket-body {
+            width: 100%;
+            height: 70px;
+            background: linear-gradient(to bottom, #8B4513 0%, #654321 100%);
+            border-radius: 10px 10px 25px 25px;
+            border: 2px solid #5a2a0a;
+            position: relative;
+        }
+        
+        .basket-handle {
+            width: 90px;
+            height: 35px;
+            border: 3px solid #8B4513;
+            border-bottom: none;
+            border-radius: 35px 35px 0 0;
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .weave-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(90,42,10,0.3) 8px, rgba(90,42,10,0.3) 10px),
+                repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(90,42,10,0.3) 8px, rgba(90,42,10,0.3) 10px);
+            border-radius: 10px 10px 30px 30px;
+        }
+        
+        .score-board {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: confettiFall 3s ease-in-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes ballPop {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        .ball-string {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, #666, transparent);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full m-0">
+  <div class="game-container w-full h-full flex flex-col">
+   <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.3); text-align: center; z-index: 2000; width: 95%; max-width: 650px; max-height: 95%; overflow-y: auto;">
+    <h2 style="font-size: 36px; color: #7c3aed; margin-bottom: 15px; font-family: system-ui, sans-serif; font-weight: bold;">🎈 TRÒ CHƠI BẮT BÓNG</h2>
+    
+    <div style="display: flex; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 15px; padding: 15px; margin-bottom: 20px; align-items: center; justify-content: space-around; gap: 15px;">
+        <div style="flex: 0 0 120px;">
+            <img src="assets/qr_code.png" alt="Mã QR" style="width: 120px; height: 120px; border-radius: 8px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: contain;">
+            <p style="font-size: 12px; color: #64748b; margin-top: 5px; font-weight: bold;">QUÉT ĐỂ CHƠI</p>
+        </div>
+        <div style="flex: 1; text-align: center;">
+            <p style="font-size: 14px; color: #475569; font-weight: bold; margin-bottom: 8px;">ĐƯỜNG LINK TRÒ CHƠI:</p>
+            <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 14px; color: #7c3aed; word-break: break-all; margin-bottom: 5px; font-weight: bold; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                https://nhungntc3ks-droid.github.io/Bai19_khoidong_khoi10/
+            </div>
+            <p style="font-size: 12px; color: #64748b; font-style: italic;">Nhập link trên vào trình duyệt để tham gia</p>
+        </div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%); padding: 20px; border-radius: 15px; margin-bottom: 25px; text-align: left;">
+     <h3 style="font-size: 20px; color: #7c3aed; margin-bottom: 12px; font-family: system-ui, sans-serif; font-weight: bold; text-align: center;">📖 Cách Chơi</h3>
+     <ul style="font-size: 15px; color: #374151; margin: 0; padding-left: 25px; font-family: system-ui, sans-serif; line-height: 1.8;">
+      <li>🎯 Bóng rơi xuống từ trên cao chứa các lệnh Python</li>
+      <li>✅ Bấm <strong style="color: #10b981;">"THÊM VÀO GIỎ"</strong> nếu công thức <strong>ĐÚNG</strong></li>
+      <li>💥 Bấm <strong style="color: #ef4444;">"ĐẬP BÓNG"</strong> nếu công thức <strong>SAI</strong></li>
+      <li>🎮 Thêm vào giỏ đúng: <strong style="color: #10b981;">+10 điểm</strong> | Thêm vào giỏ sai: <strong style="color: #ef4444;">-10 điểm</strong></li>
+      <li>💥 Đập bóng: Không cộng, không trừ điểm</li>
+      <li>⏱️ Thời gian: <strong>3 phút</strong> - 20 quả bóng</li>
+      <li>🏆 Đạt ≥80 điểm để nhận quà xuất sắc!</li>
+     </ul>
+    </div>
+    <button id="start-game-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 20px 50px; font-size: 24px; border-radius: 15px; cursor: pointer; font-weight: bold; font-family: system-ui, sans-serif; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5); transition: transform 0.2s;">▶️ Bắt Đầu Chơi</button>
+   </div>
+   <div class="score-board m-4 p-4" style="display: none;">
+    <h1 id="game-title" class="text-3xl font-bold text-purple-700 text-center mb-2">Trò Chơi Bắt Bóng</h1>
+    <div class="flex justify-around items-center flex-wrap gap-2">
+     <div class="text-center"><span id="score-label" class="text-lg font-semibold text-gray-700">Điểm: </span> <span id="score" class="text-2xl font-bold text-purple-600">0</span>
+     </div>
+     <div class="text-center"><span class="text-lg font-semibold text-gray-700">🎯 Bóng: </span> <span id="ball-counter" class="text-2xl font-bold text-orange-600">1/20</span>
+     </div>
+    </div>
+   </div>
+   <div id="game-area" class="flex-1 relative" style="display: none;">
+    <div id="basket" class="basket">
+     <div class="basket-handle"></div>
+     <div class="basket-body">
+      <div class="weave-pattern"></div>
+     </div>
+    </div><div id="timer" style="position: absolute; top: 20px; right: 20px; background: white; padding: 15px 25px; border-radius: 15px; font-size: 28px; font-weight: bold; color: #7c3aed; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+     ⏱️ <span id="time-left">3:00</span>
+    </div><div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; justify-content: center; align-items: center;"><button id="add-to-basket-btn" style="
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    font-size: 18px;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+                    transition: all 0.2s;
+                    font-family: system-ui, sans-serif;
+                    white-space: nowrap;
+                ">✅ THÊM VÀO GIỎ</button> <button id="skip-btn" style="
+                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    font-size: 18px;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+                    transition: all 0.2s;
+                    font-family: system-ui, sans-serif;
+                    white-space: nowrap;
+                ">💥 ĐẬP BÓNG</button>
+    </div>
+   </div>
+  </div>
+  <script>
+        const defaultConfig = {
+            game_title: "TRÒ CHƠI BẮT BÓNG",
+            score_label: "Điểm: ",
+            primary_color: "#667eea",
+            secondary_color: "#764ba2",
+            text_color: "#5b21b6",
+            basket_color: "#8B4513",
+            correct_color: "#10b981",
+            incorrect_color: "#ef4444",
+            font_family: "system-ui",
+            font_size: 16
+        };
+
+        let config = { ...defaultConfig };
+        
+        const questions = [
+            { text: "print('Hi')\n→ Hiển thị Hi", correct: true },
+            { text: "input('Tên?')\n→ Nhập dữ liệu", correct: true },
+            { text: "float(13+1)\n->hiển thị 14.0", correct: true },
+            { text: "10 != 3+7\n→ False", correct: true },
+            { text: "str(120)\n= '120'", correct: true },
+            { text: "print(5+3)\n→ Hiển thị 8", correct: true },
+            { text: "n=int(input())\n→ Nhập số n", correct: true },
+            { text: "'abc' * 2\n-> hiển thị 'abcabc'", correct: true },
+            { text: "20 % 6\n-> 2", correct: true },
+            { text: "bool(0)\n→ False", correct: true },
+            { text: "print('Hi')\n== 'Hi'", correct: false },
+            { text: "input('Tên?')\n→ Hiển thị: Tên?", correct: false },
+            { text: "int('42')\n-> hiển thị '42'", correct: false },
+            { text: "5 > 0\n→ False", correct: false },
+            { text: "print(10)\n= 10", correct: false },
+            { text: "str(100)\n= 100", correct: false },
+            { text: "input()\n→ Hiển thị text", correct: false },
+            { text: "10 - 4\n -> kết quả: 7", correct: false },
+            { text: "3 ** 2\n-> kết quả: 6", correct: false },
+            { text: "bool(1)\n→ False", correct: false }
+        ];
+
+        let score = 0;
+        let currentBallIndex = 0;
+        let shuffledQuestions = [];
+        let currentBall = null;
+        let ballFallInterval = null;
+        let isGameOver = false;
+        let ballY = 50;
+        let fallSpeed = 0.8;
+        let basketX = 0;
+        let timeLeft = 180;
+        let timerInterval = null;
+        let backgroundMusic = null;
+
+        const gameArea = document.getElementById('game-area');
+        const scoreDisplay = document.getElementById('score');
+        const ballCounterDisplay = document.getElementById('ball-counter');
+        const timeLeftDisplay = document.getElementById('time-left');
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timeLeftDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            if (timeLeft <= 0) endGame();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!isGameOver) {
+                    timeLeft--;
+                    updateTimer();
+                }
+            }, 1000);
+        }
+
+        function createBall(question) {
+            const gameWidth = gameArea.offsetWidth;
+            const ballSize = 190;
+            const ballString = document.createElement('div');
+            ballString.className = 'ball-string';
+            ballString.style.left = (gameWidth / 2) + 'px';
+            ballString.style.height = '50px';
+            gameArea.appendChild(ballString);
+            const ballElement = document.createElement('div');
+            ballElement.className = 'ball';
+            ballElement.style.left = ((gameWidth - ballSize) / 2) + 'px';
+            ballElement.style.top = '50px';
+            ballElement.style.width = ballSize + 'px';
+            ballElement.style.height = ballSize + 'px';
+            ballElement.style.fontSize = '22px';
+            const ballColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dfe6e9', '#a29bfe', '#fd79a8'];
+            ballElement.style.backgroundColor = ballColors[Math.floor(Math.random() * ballColors.length)];
+            ballElement.style.color = '#1f2937';
+            ballElement.style.lineHeight = '1.4';
+            ballElement.textContent = question.text;
+            const ballKnot = document.createElement('div');
+            ballKnot.className = 'ball-knot';
+            ballElement.appendChild(ballKnot);
+            gameArea.appendChild(ballElement);
+            ballY = 50;
+            return { element: ballElement, string: ballString, question: question };
+        }
+
+        function nextBall() {
+            if (currentBallIndex >= shuffledQuestions.length || timeLeft <= 0) {
+                endGame();
+                return;
+            }
+            const question = shuffledQuestions[currentBallIndex];
+            currentBall = createBall(question);
+            ballCounterDisplay.textContent = `${currentBallIndex + 1}/20`;
+            const basket = document.getElementById('basket');
+            const basketRect = basket.getBoundingClientRect();
+            const gameRect = gameArea.getBoundingClientRect();
+            const stopPosition = basketRect.top - gameRect.top - 50;
+            ballFallInterval = setInterval(() => {
+                if (!currentBall || isGameOver) {
+                    clearInterval(ballFallInterval);
+                    return;
+                }
+                ballY += fallSpeed;
+                currentBall.element.style.top = ballY + 'px';
+                currentBall.string.style.height = ballY + 'px';
+                if (ballY >= stopPosition) {
+                    ballY = stopPosition;
+                    currentBall.element.style.top = stopPosition + 'px';
+                    currentBall.string.style.height = stopPosition + 'px';
+                    clearInterval(ballFallInterval);
+                    ballFallInterval = null;
+                }
+            }, 20);
+        }
+
+        function handleAddToBasket() {
+            if (!currentBall || isGameOver) return;
+            clearInterval(ballFallInterval);
+            if (currentBall.question.correct) {
+                score += 10;
+                playSound('correct');
+                showFeedback(true);
+            } else {
+                score -= 10;
+                playSound('wrong');
+                showFeedback(false);
+            }
+            updateScoreDisplay();
+            animateBallToBasket();
+        }
+
+        function handleSkip() {
+            if (!currentBall || isGameOver) return;
+            clearInterval(ballFallInterval);
+            playSound('pop');
+            updateScoreDisplay();
+            animateBallPop();
+        }
+
+        function animateBallToBasket() {
+            const basket = document.getElementById('basket');
+            const basketRect = basket.getBoundingClientRect();
+            const gameRect = gameArea.getBoundingClientRect();
+            const targetX = basketRect.left + basketRect.width / 2 - gameRect.left - 95;
+            const targetY = basketRect.top - gameRect.top;
+            currentBall.element.style.transition = 'all 0.5s ease-in';
+            currentBall.element.style.left = targetX + 'px';
+            currentBall.element.style.top = targetY + 'px';
+            currentBall.element.style.transform = 'scale(0.3)';
+            currentBall.element.style.opacity = '0.5';
+            setTimeout(() => {
+                if (currentBall) {
+                    currentBall.element.remove();
+                    currentBall.string.remove();
+                    currentBall = null;
+                    currentBallIndex++;
+                    nextBall();
+                }
+            }, 600);
+        }
+
+        function animateBallPop() {
+            currentBall.element.style.animation = 'ballPop 0.5s ease-out forwards';
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffeaa7', '#a29bfe'];
+            for (let i = 0; i < 12; i++) {
+                const piece = document.createElement('div');
+                piece.style.cssText = `
+                    position: absolute; width: 20px; height: 20px; border-radius: 50%;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${currentBall.element.offsetLeft + 95}px;
+                    top: ${currentBall.element.offsetTop + 95}px;
+                    transition: all 0.6s ease-out;
+                `;
+                gameArea.appendChild(piece);
+                setTimeout(() => {
+                    const angle = (Math.PI * 2 * i) / 12;
+                    const distance = 120 + Math.random() * 60;
+                    piece.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`;
+                    piece.style.opacity = '0';
+                }, 50);
+                setTimeout(() => piece.remove(), 700);
+            }
+            setTimeout(() => {
+                if (currentBall) {
+                    currentBall.element.remove();
+                    currentBall.string.remove();
+                    currentBall = null;
+                    currentBallIndex++;
+                    nextBall();
+                }
+            }, 600);
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                font-size: 64px; font-weight: bold; z-index: 1000; animation: fadeOut 1s forwards;
+            `;
+            feedback.textContent = isCorrect ? '✅' : '❌';
+            gameArea.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 1000);
+        }
+
+        function updateScoreDisplay() { scoreDisplay.textContent = score; }
+        
+        function playSound(type) {
+            let soundFile = '';
+            if (type === 'correct') soundFile = 'assets/correct_answer.mp3';
+            else if (type === 'wrong') soundFile = 'assets/wrong_answer.mp3';
+            else if (type === 'pop') soundFile = 'assets/ball_pop.mp3';
+            else if (type === 'celebrate') soundFile = 'assets/celebration.mp3';
+            if (soundFile) {
+                const audio = new Audio(soundFile);
+                audio.play().catch(e => console.log('Lỗi âm thanh:', e));
+            }
+        }
+
+        function startBackgroundMusic() {
+            backgroundMusic = new Audio('assets/background_music.mp3');
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.3;
+            backgroundMusic.play().catch(e => console.log('Lỗi nhạc nền:', e));
+        }
+
+        function stopBackgroundMusic() {
+            if (backgroundMusic) {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+            }
+        }
+
+        function endGame() {
+            isGameOver = true;
+            clearInterval(ballFallInterval);
+            clearInterval(timerInterval);
+            stopBackgroundMusic();
+            if (currentBall) {
+                currentBall.element.remove();
+                currentBall.string.remove();
+            }
+            const endScreen = document.createElement('div');
+            endScreen.style.cssText = `
+                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                text-align: center; z-index: 1000; width: 90%; max-width: 500px; max-height: 90%; overflow-y: auto;
+            `;
+            let rating = '';
+            let isExcellent = false;
+            if (score >= 80) { rating = '🏆 XUẤT SẮC!'; isExcellent = true; }
+            else if (score >= 60) rating = '⭐Bạn giỏi Lắm!';
+            else if (score >= 40) rating = '👍 Khá Tốt!';
+            else if (score >= 0) rating = '📚 Cần Ôn Tập!';
+            else rating = '💪 Cố Gắng Thêm!';
+            if (isExcellent) {
+                createConfetti(); playSound('celebrate');
+                endScreen.innerHTML = `
+                    <h2 style="font-size: 36px; color: #7c3aed; margin-bottom: 20px; font-weight: bold;">🏆 ${rating}</h2>
+                    <p style="font-size: 24px; color: #4b5563; margin-bottom: 20px;">Điểm Số: <strong style="color: #7c3aed; font-size: 32px;">${score}</strong></p>
+                    <div style="background: linear-gradient(135deg, #fff5e1 0%, #ffe5e5 100%); padding: 25px; border-radius: 15px; margin-bottom: 25px;">
+                        <h3 style="font-size: 22px; color: #ff6b6b; margin-bottom: 15px; font-weight: bold;">🎁 Chọn Giỏ Quà:</h3>
+                        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                            <button class="gift-basket-btn" data-gift="1" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border: none; width: 100px; height: 100px; font-size: 40px; border-radius: 15px; cursor: pointer;">🧺</button>
+                            <button class="gift-basket-btn" data-gift="2" style="background: linear-gradient(135deg, #4ecdc4 0%, #44a8a8 100%); color: white; border: none; width: 100px; height: 100px; font-size: 40px; border-radius: 15px; cursor: pointer;">🧺</button>
+                            <button class="gift-basket-btn" data-gift="3" style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: white; border: none; width: 100px; height: 100px; font-size: 40px; border-radius: 15px; cursor: pointer;">🧺</button>
+                        </div>
+                    </div>
+                    <div id="gift-result" style="display: none; font-size: 20px; color: #10b981; margin-bottom: 20px; font-weight: bold; padding: 20px; background: #f0fdf4; border-radius: 12px; border: 2px solid #10b981;"></div>
+                    <button id="restart-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 40px; font-size: 20px; border-radius: 10px; cursor: pointer; display: none;">🔄 Chơi Lại</button>
+                `;
+                gameArea.appendChild(endScreen);
+                const giftButtons = endScreen.querySelectorAll('.gift-basket-btn');
+                giftButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const giftType = this.getAttribute('data-gift');
+                        let msg = '';
+                        if (giftType === '1') msg = '🎉 Tràng vỗ tay từ lớp!';
+                        else if (giftType === '2') msg = '🎉 Một bài hát tặng bạn!';
+                        else if (giftType === '3') msg = '🎉 Cộng 1 điểm từ cô Nhung!';
+                        document.getElementById('gift-result').innerHTML = msg;
+                        document.getElementById('gift-result').style.display = 'block';
+                        document.getElementById('restart-btn').style.display = 'block';
+                        giftButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.3'; });
+                        this.style.transform = 'scale(1.2)'; this.style.opacity = '1';
+                    });
+                });
+            } else {
+                endScreen.innerHTML = `
+                    <h2 style="font-size: 36px; color: #7c3aed; margin-bottom: 20px; font-weight: bold;">${rating}</h2>
+                    <p style="font-size: 24px; color: #4b5563; margin-bottom: 30px;">Điểm Số: <strong style="color: #7c3aed; font-size: 32px;">${score}</strong></p>
+                    <button id="restart-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 40px; font-size: 20px; border-radius: 10px; cursor: pointer;">🔄 Chơi Lại</button>
+                `;
+                gameArea.appendChild(endScreen);
+            }
+            document.getElementById('restart-btn').addEventListener('click', () => { endScreen.remove(); restartGame(); });
+        }
+        
+        function createConfetti() {
+            const colors = ['#fbbf24', '#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#8b5cf6'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + '%';
+                    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    gameArea.appendChild(c);
+                    setTimeout(() => c.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        function restartGame() {
+            score = 0; currentBallIndex = 0; isGameOver = false; timeLeft = 180;
+            shuffledQuestions = shuffleArray(questions);
+            document.getElementById('start-screen').style.display = 'block';
+            document.querySelector('.score-board').style.display = 'none';
+            document.getElementById('game-area').style.display = 'none';
+            scoreDisplay.textContent = score;
+            ballCounterDisplay.textContent = '1/20';
+            timeLeftDisplay.textContent = '3:00';
+        }
+
+        function startGame() {
+            shuffledQuestions = shuffleArray(questions);
+            startTimer(); startBackgroundMusic(); nextBall();
+        }
+
+        function createFallingDecorations() {
+            const decorations = ['🌸', '🌺', '🌼', '🌻', '🌷', '🍃', '🌿'];
+            const container = document.querySelector('.game-container');
+            setInterval(() => {
+                const d = document.createElement('div');
+                d.className = 'falling-decoration';
+                d.textContent = decorations[Math.floor(Math.random() * decorations.length)];
+                d.style.left = Math.random() * 100 + '%';
+                d.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                container.appendChild(d);
+                setTimeout(() => d.remove(), 15000);
+            }, 800);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createFallingDecorations();
+            document.getElementById('start-game-btn').addEventListener('click', () => {
+                document.getElementById('start-screen').style.display = 'none';
+                document.querySelector('.score-board').style.display = 'block';
+                document.getElementById('game-area').style.display = 'block';
+                startGame();
+            });
+            document.getElementById('add-to-basket-btn').addEventListener('click', handleAddToBasket);
+            document.getElementById('skip-btn').addEventListener('click', handleSkip);
+        });
+
+        async function onConfigChange(newConfig) {
+            config = { ...config, ...newConfig };
+            document.getElementById('game-title').textContent = config.game_title;
+            document.getElementById('score-label').textContent = config.score_label;
+            const titleElement = document.getElementById('game-title');
+            titleElement.style.color = config.text_color;
+            const basketBody = document.querySelector('.basket-body');
+            basketBody.style.background = `linear-gradient(to bottom, ${config.basket_color} 0%, #5a2a0a 100%)`;
+        }
+
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities: (config) => ({
+                    recolorables: [
+                        { get: () => config.primary_color, set: (v) => { config.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); } },
+                        { get: () => config.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+                        { get: () => config.basket_color, set: (v) => { config.basket_color = v; window.elementSdk.setConfig({ basket_color: v }); } }
+                    ],
+                    fontEditable: { get: () => config.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } }
+                }),
+                mapToEditPanelValues: (config) => new Map([["game_title", config.game_title], ["score_label", config.score_label]])
+            });
+        }
+        window.addEventListener('load', () => onConfigChange(defaultConfig));
+    </script>
+ </body>
+</html>

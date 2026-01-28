@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mô Phỏng Lùa Bò Vào Chuồng</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { box-sizing: border-box; }
+    .dragging { opacity: 0.5; }
+    .drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    .shake { animation: shake 0.3s; }
+  </style>
+ </head>
+ <body class="h-full">
+
+  <audio id="nhac-nen" src="nhac_nen.mp3" loop></audio> <audio id="am-thanh-dung" src="dung.mp3"></audio>      <audio id="am-thanh-sai" src="sai.mp3"></audio>        <audio id="am-thanh-thang" src="thang.mp3"></audio>    <audio id="am-thanh-click" src="click.mp3"></audio>    <main class="h-full w-full overflow-auto" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+   <div class="min-h-full p-6">
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
+     <header class="text-center mb-8 pb-6 border-b-4" style="border-color: #667eea;">
+      <h1 id="mainTitle" class="text-4xl font-bold mb-3" style="color: #667eea;">Mô Phỏng Lùa Bò Vào Chuồng</h1>
+      <p id="instruction" class="text-lg text-gray-600">Kéo mỗi con bò vào chuồng có số tương ứng</p>
+     </header>
+
+     <div id="setupScreen">
+      <div class="bg-gray-50 rounded-xl p-6 mb-6">
+       <label for="cowNumbers" class="block text-lg font-semibold text-gray-700 mb-3"> 🐄 Nhập các số cho bò (cách nhau bởi dấu phẩy): </label> 
+       <input type="text" id="cowNumbers" value="3, 7, 1, 9, 5" class="w-full px-4 py-3 text-lg border-2 rounded-lg focus:outline-none focus:ring-2" style="border-color: #667eea;">
+      </div>
+      <button id="startBtn" class="w-full text-white text-xl font-bold py-4 px-8 rounded-xl shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"> ▶️ Bắt đầu </button>
+     </div>
+
+     <div id="gameScreen" class="hidden">
+      <div class="bg-gray-50 rounded-xl p-4 mb-6 flex items-center justify-between">
+       <div id="timer" class="text-2xl font-bold px-6 py-2 bg-white rounded-lg shadow" style="color: #667eea;"> ⏱️ 0:00 </div>
+       <div class="flex-1 ml-4">
+        <div class="h-8 bg-gray-200 rounded-full overflow-hidden">
+         <div id="progress" class="h-full text-white text-sm font-bold flex items-center justify-center transition-all duration-300" style="width: 0%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"> 0% </div>
+        </div>
+       </div>
+      </div>
+
+      <div class="space-y-6 mb-6">
+       <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border-4" style="border-color: #667eea;">
+        <h2 class="text-2xl font-bold text-center mb-4" style="color: #667eea;">🐄 Đàn Bò</h2>
+        <div id="cowsContainer" class="flex flex-wrap gap-4 justify-center min-h-[150px]"></div>
+       </div>
+       <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border-4 border-gray-400">
+        <h2 class="text-2xl font-bold text-center mb-4 text-gray-700">🏠 Chuồng Bò</h2>
+        <div id="barnsContainer" class="flex flex-wrap gap-4 justify-center min-h-[150px]"></div>
+       </div>
+      </div>
+      <button id="resetBtn" class="w-full bg-red-600 text-white text-xl font-bold py-4 rounded-xl"> 🔄 Chạy lại </button>
+     </div>
+
+     <div id="resultScreen" class="hidden text-center">
+      <div class="rounded-xl p-12 text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+       <div class="text-8xl mb-6"> 🎉 </div>
+       <h2 class="text-4xl font-bold mb-4">Hoàn Thành!</h2>
+       <div class="bg-white bg-opacity-20 rounded-xl p-6 mb-8 max-w-md mx-auto">
+        <div class="flex justify-between py-2 border-b border-white border-opacity-30"><span>Số bò:</span> <span id="resultCount" class="font-bold">0</span></div>
+        <div class="flex justify-between py-2"><span>Thời gian:</span> <span id="resultTime" class="font-bold">0:00</span></div>
+       </div>
+       <button id="playAgainBtn" class="bg-white text-xl font-bold py-4 px-12 rounded-xl" style="color: #667eea;"> 🔄 Chơi lại </button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </main>
+
+  <script>
+    // Hàm phát âm thanh hiệu ứng
+    function phatAmThanh(id) {
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Lỗi âm thanh hiệu ứng"));
+      }
+    }
+
+    // Hàm điều khiển nhạc nền
+    function dieuKhienNhacNen(phat) {
+      const music = document.getElementById('nhac-nen');
+      if (music) {
+        if (phat) {
+          music.volume = 0.3; // Nhạc nền nhỏ hơn hiệu ứng
+          music.play().catch(e => console.log("Cần tương tác để phát nhạc"));
+        } else {
+          music.pause();
+          music.currentTime = 0;
+        }
+      }
+    }
+
+    const defaultConfig = {
+      main_title: "Mô Phỏng Lùa Bò Vào Chuồng",
+      instruction: "Kéo mỗi con bò vào chuồng có số tương ứng",
+      start_text: "▶️ Bắt đầu",
+      reset_text: "🔄 Chạy lại",
+      primary_color: "#667eea",
+      secondary_color: "#764ba2",
+      background_color: "#667eea"
+    };
+
+    let gameState = { cowCount: 0, cows: [], barns: [], matched: 0, startTime: null, timerInterval: null };
+    const cowColors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#f97316', '#6366f1'];
+
+    function initGame() {
+      phatAmThanh('am-thanh-click');
+      dieuKhienNhacNen(true); // Phát nhạc nền khi bắt đầu
+      const input = document.getElementById('cowNumbers').value;
+      const numbers = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+      
+      if (numbers.length === 0) { alert('Vui lòng nhập số!'); return; }
+      
+      gameState.cowCount = numbers.length;
+      gameState.matched = 0;
+      gameState.startTime = Date.now();
+      gameState.cows = numbers.map((num, i) => ({ id: i + 1, number: num, color: cowColors[i % cowColors.length], matched: false }));
+      gameState.cows.sort(() => Math.random() - 0.5);
+      
+      const maxNumber = Math.max(...numbers);
+      gameState.barns = Array.from({length: maxNumber}, (_, i) => ({ id: i + 1, number: i + 1, cowCount: 0 }));
+
+      document.getElementById('setupScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      renderGame();
+      startTimer();
+      updateProgress();
+    }
+
+    function renderGame() {
+      const cowsContainer = document.getElementById('cowsContainer');
+      const barnsContainer = document.getElementById('barnsContainer');
+      cowsContainer.innerHTML = '';
+      gameState.cows.forEach(cow => {
+        if (!cow.matched) {
+          const cowEl = document.createElement('div');
+          cowEl.className = 'w-24 h-24 bg-white rounded-xl flex flex-col items-center justify-center cursor-move shadow-lg border-4';
+          cowEl.style.borderColor = cow.color;
+          cowEl.draggable = true;
+          cowEl.innerHTML = `<div class="text-4xl">🐄</div><div class="text-xl font-bold">${cow.number}</div>`;
+          cowEl.addEventListener('dragstart', (e) => { e.dataTransfer.setData('cowId', cow.id); });
+          cowsContainer.appendChild(cowEl);
+        }
+      });
+
+      barnsContainer.innerHTML = '';
+      gameState.barns.forEach(barn => {
+        const wrapperEl = document.createElement('div');
+        wrapperEl.className = 'flex flex-col items-center gap-2';
+        wrapperEl.innerHTML = `
+          <div class="text-sm font-bold text-gray-700 bg-white px-3 py-1 rounded-full shadow">Chuồng ${barn.number}</div>
+          <div id="barn-${barn.id}" class="w-28 h-28 bg-amber-800 rounded-xl flex items-center justify-center border-4 border-amber-950 text-white text-4xl font-bold shadow-inner">
+            ${barn.cowCount}
+          </div>
+        `;
+        const barnEl = wrapperEl.querySelector(`#barn-${barn.id}`);
+        barnEl.addEventListener('dragover', (e) => { e.preventDefault(); barnEl.style.transform = 'scale(1.1)'; });
+        barnEl.addEventListener('dragleave', () => { barnEl.style.transform = 'scale(1)'; });
+        barnEl.addEventListener('drop', (e) => {
+          e.preventDefault();
+          barnEl.style.transform = 'scale(1)';
+          const cowId = parseInt(e.dataTransfer.getData('cowId'));
+          handleDrop(cowId, barn.id);
+        });
+        barnsContainer.appendChild(wrapperEl);
+      });
+    }
+
+    function handleDrop(cowId, barnId) {
+      const cow = gameState.cows.find(c => c.id === cowId);
+      const barn = gameState.barns.find(b => b.id === barnId);
+      
+      if (cow.number === barn.number) {
+        phatAmThanh('am-thanh-dung'); // Kéo đúng kêu ở đây
+        cow.matched = true;
+        barn.cowCount++;
+        gameState.matched++;
+        renderGame();
+        updateProgress();
+        if (gameState.matched === gameState.cowCount) {
+          setTimeout(showResult, 500);
+        }
+      } else {
+        phatAmThanh('am-thanh-sai');
+      }
+    }
+
+    function startTimer() {
+      gameState.timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+        document.getElementById('timer').textContent = `⏱️ ${Math.floor(elapsed/60)}:${(elapsed%60).toString().padStart(2,'0')}`;
+      }, 1000);
+    }
+
+    function updateProgress() {
+      const percent = Math.round((gameState.matched / gameState.cowCount) * 100);
+      document.getElementById('progress').style.width = percent + '%';
+      document.getElementById('progress').textContent = percent + '%';
+    }
+
+    function showResult() {
+      dieuKhienNhacNen(false); // Dừng nhạc nền khi thắng
+      phatAmThanh('am-thanh-thang');
+      clearInterval(gameState.timerInterval);
+      const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+      document.getElementById('resultCount').textContent = gameState.cowCount;
+      document.getElementById('resultTime').textContent = `${Math.floor(totalTime/60)}:${(totalTime%60).toString().padStart(2,'0')}`;
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+    }
+
+    function resetGame() {
+      phatAmThanh('am-thanh-click');
+      dieuKhienNhacNen(false); // Dừng nhạc nền khi reset
+      clearInterval(gameState.timerInterval);
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('setupScreen').classList.remove('hidden');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', initGame);
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
+    document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+  </script>
+ </body>
+</html>

@@ -1,0 +1,436 @@
+<!doctype doctype>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Học Câu Lệnh IF - Tính Giá Cam</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body class="h-full m-0 p-0">
+  <div id="app" class="h-full w-full overflow-auto" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+   <div style="min-height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px;">
+    <div style="max-width: 1200px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden;"><!-- Header -->
+     <div id="header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; color: white; text-align: center;">
+      <h1 id="mainTitle" style="margin: 0 0 10px 0; font-size: 32px; font-weight: bold;">🍊 Câu Lệnh IF</h1>
+      <p style="margin: 0; font-size: 16px; opacity: 0.95;">Học lập trình Python qua bài toán thực tế</p>
+     </div><!-- Main Content -->
+     <div style="padding: 30px;"><!-- Section 1: Bài toán tính cam -->
+      <div style="margin-bottom: 30px; background: #f8f9ff; padding: 25px; border-radius: 12px; border-left: 5px solid #667eea;">
+       <h2 id="problemTitle" style="margin: 0 0 15px 0; color: #667eea; font-size: 24px; display: flex; align-items: center;">📝 Đề Bài Toán</h2><!-- Video Placeholder -->
+       <div style="background: white; padding: 20px; border-radius: 8px; border: 2px dashed #cbd5e1; text-align: center; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="font-size: 48px; margin-bottom: 10px;">
+        <div style="background: white; padding: 20px; border-radius: 8px; border: 2px dashed #cbd5e1; text-align: center; min-height: 150px;">
+  <video width="100%" height="auto" controls>
+    <source src="video.mp4"" type="video/mp4">
+    Trình duyệt của bạn không hỗ trợ thẻ video.
+  </video>
+</div>
+
+     </div><!-- Section 2: Phân Tích -->
+      <div style="margin-bottom: 30px; background: #fff7ed; padding: 25px; border-radius: 12px; border-left: 5px solid #f59e0b;">
+       <h2 style="margin: 0 0 20px 0; color: #f59e0b; font-size: 24px; display: flex; align-items: center;">🔍 Phân Tích Bài Toán</h2>
+       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;"><!-- Input -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+         <h3 style="margin: 0 0 12px 0; color: #667eea; font-size: 18px; display: flex; align-items: center;">⬇️ INPUT (Đầu vào)</h3>
+         <p style="margin: 0; color: #555; line-height: 1.6;">• Số kg cam cần mua (<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #667eea;">n</code>)</p>
+        </div><!-- Output -->
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+         <h3 style="margin: 0 0 12px 0; color: #667eea; font-size: 18px; display: flex; align-items: center;">⬆️ OUTPUT (Đầu ra)</h3>
+         <p style="margin: 0; color: #555; line-height: 1.6;">• Tổng tiền phải trả (đồng)</p>
+        </div>
+       </div><!-- Ví Dụ Mô Phỏng Tương Tác -->
+       <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3 style="margin: 0 0 15px 0; color: #10b981; font-size: 18px;">💡 Ví Dụ</h3><!-- Ô tương tác -->
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 2px solid #10b981;">
+         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+          <div><label style="display: block; margin-bottom: 8px; color: #166534; font-weight: bold; font-size: 14px;"> 📥 Nhập số kg cam: </label> <input id="exampleInput" type="number" step="0.1" value="5" style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 6px; font-size: 18px; font-weight: bold; text-align: center; background: white;">
+          </div>
+          <div><label style="display: block; margin-bottom: 8px; color: #166534; font-weight: bold; font-size: 14px;">Kết quả (đồng): </label>
+           <div id="exampleOutput" style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 6px; font-size: 18px; font-weight: bold; text-align: center; background: white; color: #10b981;">
+            125,000
+           </div>
+          </div>
+         </div>
+         <div id="exampleExplanation" style="background: white; padding: 12px; border-radius: 6px; font-size: 14px; color: #666; text-align: center;">
+          ⚡ Vì <strong>5 kg ≤ 5</strong> nên giá = 5 × 25,000 = <strong style="color: #10b981;">125,000 đồng</strong>
+         </div>
+        </div><!-- Ví dụ tĩnh -->
+        <div style="display: grid; gap: 10px;">
+         <div style="background: #f0fdf4; padding: 10px; border-radius: 6px; border-left: 3px solid #10b981; font-size: 14px;"><strong style="color: #10b981;">Ví dụ 1:</strong> n = 8 kg → 8 × 20,000 = <strong>160,000 đồng</strong> (vì 8 &gt; 5)
+         </div>
+         <div style="background: #fffbeb; padding: 10px; border-radius: 6px; border-left: 3px solid #f59e0b; font-size: 14px;"><strong style="color: #f59e0b;">Ví dụ 2:</strong> n = 3 kg → 3 × 25,000 = <strong>75,000 đồng</strong> (vì 3 < 5)
+         </div>
+        </div>
+       </div>
+      </div><!-- Section 3: Viết Code -->
+      <div style="margin-bottom: 30px; background: #f0fdf4; padding: 25px; border-radius: 12px; border-left: 5px solid #10b981;">
+       <h2 style="margin: 0 0 15px 0; color: #10b981; font-size: 24px; display: flex; align-items: center;">⌨️ Viết Chương Trình Python</h2>
+       <p style="margin: 0 0 15px 0; color: #666;">Hãy viết code Python của bạn vào ô bên dưới:</p><textarea id="codeInput" style="width: 100%; min-height: 250px; font-family: 'Courier New', monospace; font-size: 14px; padding: 15px; border: 2px solid #cbd5e1; border-radius: 8px; background: #1e293b; color: #e2e8f0; resize: vertical;" placeholder="# Viết code Python của bạn ở đây..."></textarea>
+       <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;"><button id="runButton" style="background: #10b981; color: white; border: none; padding: 12px 30px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: all 0.2s;"> ▶️ <span id="runButtonText">Chạy Chương Trình</span> </button> <button id="clearButton" style="background: #64748b; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s;"> 🗑️ Xóa </button>
+       </div>
+      </div><!-- Section 4: Input/Output -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;"><!-- Input -->
+       <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border-left: 5px solid #3b82f6;">
+        <h3 style="margin: 0 0 12px 0; color: #3b82f6; font-size: 18px;">📥 Nhập Dữ Liệu</h3><label style="display: block; margin-bottom: 8px; color: #666; font-size: 14px;">Số kg cam:</label> <input id="inputData" type="number" step="0.1" placeholder="Ví dụ: 8" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+       </div><!-- Output -->
+       <div style="background: #fef3c7; padding: 20px; border-radius: 12px; border-left: 5px solid #f59e0b;">
+        <h3 style="margin: 0 0 12px 0; color: #f59e0b; font-size: 18px;">📤 Kết Quả</h3>
+        <div id="output" style="background: white; padding: 15px; border-radius: 6px; min-height: 50px; font-family: 'Courier New', monospace; color: #333; white-space: pre-wrap; font-size: 14px; border: 2px solid #e5e7eb;">
+         Chưa có kết quả...
+        </div>
+       </div>
+      </div><!-- Error Display -->
+      <div id="errorBox" style="display: none; background: #fef2f2; border: 2px solid #ef4444; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+       <h3 style="margin: 0 0 10px 0; color: #ef4444; font-size: 18px; display: flex; align-items: center;">⚠️ Lỗi Chương Trình</h3>
+       <div id="errorMessage" style="color: #991b1b; font-family: 'Courier New', monospace; font-size: 14px; white-space: pre-wrap;"></div>
+      </div><!-- History Section -->
+      <div style="background: #f8fafc; padding: 25px; border-radius: 12px; border: 2px solid #e2e8f0;">
+       <h2 style="margin: 0 0 15px 0; color: #475569; font-size: 20px; display: flex; align-items: center;">📚 Lịch Sử Chạy Code</h2>
+       <div id="historyList" style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="color: #94a3b8; text-align: center; padding: 20px;">Chưa có l   ch sử...</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // Config setup
+    const defaultConfig = {
+      main_title: "🍊 Học Câu Lệnh IF - Bài Toán Tính Giá Cam",
+      problem_title: "📝 Đề Bài Toán",
+      run_button_text: "Chạy Chương Trình",
+      background_color: "#667eea",
+      surface_color: "#ffffff",
+      text_color: "#333333",
+      primary_action_color: "#10b981",
+      secondary_action_color: "#64748b",
+      font_family: "Segoe UI",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let historyData = [];
+
+    // Data SDK setup
+    const dataHandler = {
+      onDataChanged(data) {
+        historyData = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        renderHistory();
+      }
+    };
+
+    async function initializeSdk() {
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init(dataHandler);
+        if (!result.isOk) {
+          console.error("Failed to initialize data SDK");
+        }
+      }
+    }
+
+    // Element SDK setup
+    async function onConfigChange(newConfig) {
+      const mainTitle = document.getElementById('mainTitle');
+      const problemTitle = document.getElementById('problemTitle');
+      const runButtonText = document.getElementById('runButtonText');
+      const header = document.getElementById('header');
+      const app = document.getElementById('app');
+      const runButton = document.getElementById('runButton');
+      const clearButton = document.getElementById('clearButton');
+
+      if (mainTitle) mainTitle.textContent = newConfig.main_title || defaultConfig.main_title;
+      if (problemTitle) problemTitle.textContent = newConfig.problem_title || defaultConfig.problem_title;
+      if (runButtonText) runButtonText.textContent = newConfig.run_button_text || defaultConfig.run_button_text;
+
+      const bgColor = newConfig.background_color || defaultConfig.background_color;
+      const surfaceColor = newConfig.surface_color || defaultConfig.surface_color;
+      const textColor = newConfig.text_color || defaultConfig.text_color;
+      const primaryColor = newConfig.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = newConfig.secondary_action_color || defaultConfig.secondary_action_color;
+      const fontFamily = newConfig.font_family || defaultConfig.font_family;
+      const baseFontSize = newConfig.font_size || defaultConfig.font_size;
+
+      if (header) {
+        header.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${bgColor} 100%)`;
+      }
+      if (app) {
+        app.style.fontFamily = `${fontFamily}, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`;
+        app.style.fontSize = `${baseFontSize}px`;
+        app.style.color = textColor;
+      }
+      if (runButton) {
+        runButton.style.background = primaryColor;
+      }
+      if (clearButton) {
+        clearButton.style.background = secondaryColor;
+      }
+
+      document.querySelectorAll('h1').forEach(el => {
+        el.style.fontSize = `${baseFontSize * 2}px`;
+      });
+      document.querySelectorAll('h2').forEach(el => {
+        el.style.fontSize = `${baseFontSize * 1.5}px`;
+      });
+      document.querySelectorAll('h3').forEach(el => {
+        el.style.fontSize = `${baseFontSize * 1.125}px`;
+      });
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["problem_title", config.problem_title || defaultConfig.problem_title],
+          ["run_button_text", config.run_button_text || defaultConfig.run_button_text]
+        ])
+      });
+
+      config = window.elementSdk.config;
+    }
+
+    // Python runner setup
+    let currentInput = "";
+
+    function outf(text) {
+      const output = document.getElementById('output');
+      output.textContent += text;
+    }
+
+    function builtinRead(x) {
+      if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+        throw "File not found: '" + x + "'";
+      return Sk.builtinFiles["files"][x];
+    }
+
+    function inputFunction(prompt) {
+      if (prompt) {
+        outf(prompt);
+      }
+      if (currentInput === "") {
+        throw new Sk.builtin.Exception("Không có dữ liệu đầu vào! Vui lòng nhập số kg cam vào ô 'Nhập Dữ Liệu'.");
+      }
+      const value = currentInput;
+      currentInput = "";
+      outf(value + "\n");
+      return value;
+    }
+
+    async function runCode() {
+      const code = document.getElementById('codeInput').value.trim();
+      const inputData = document.getElementById('inputData').value.trim();
+      const output = document.getElementById('output');
+      const errorBox = document.getElementById('errorBox');
+      const errorMessage = document.getElementById('errorMessage');
+      const runButton = document.getElementById('runButton');
+
+      if (!code) {
+        errorBox.style.display = 'block';
+        errorMessage.textContent = "Vui lòng viết code trước khi chạy!";
+        return;
+      }
+
+      errorBox.style.display = 'none';
+      output.textContent = '';
+      currentInput = inputData;
+      runButton.disabled = true;
+      runButton.style.opacity = '0.6';
+
+      Sk.configure({
+        output: outf,
+        read: builtinRead,
+        inputfun: inputFunction,
+        inputfunTakesPrompt: true,
+        __future__: Sk.python3
+      });
+
+      try {
+        await Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, code, true));
+        
+        const result = output.textContent.trim();
+        const isCorrect = checkResult(inputData, result);
+
+        if (window.dataSdk && historyData.length < 999) {
+          await window.dataSdk.create({
+            id: Date.now().toString(),
+            code: code,
+            result: result,
+            timestamp: new Date().toISOString(),
+            isCorrect: isCorrect
+          });
+        }
+
+        if (!isCorrect && result) {
+          errorBox.style.display = 'block';
+          errorMessage.textContent = "⚠️ Kết quả có vẻ không đúng. Hãy kiểm tra lại logic câu lệnh IF của bạn!";
+        }
+      } catch (err) {
+        errorBox.style.display = 'block';
+        errorMessage.textContent = err.toString();
+      } finally {
+        runButton.disabled = false;
+        runButton.style.opacity = '1';
+      }
+    }
+
+    function checkResult(input, output) {
+      if (!input || !output) return false;
+      const n = parseFloat(input);
+      if (isNaN(n)) return false;
+      
+      const expectedPrice = n > 5 ? n * 20000 : n * 25000;
+      const actualPrice = parseFloat(output.replace(/[^0-9.]/g, ''));
+      
+      return Math.abs(expectedPrice - actualPrice) < 0.01;
+    }
+
+    function renderHistory() {
+      const historyList = document.getElementById('historyList');
+      
+      if (historyData.length === 0) {
+        historyList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Chưa có lịch sử...</p>';
+        return;
+      }
+
+      historyList.innerHTML = historyData.map(item => `
+        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid ${item.isCorrect ? '#10b981' : '#f59e0b'};">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+            <span style="font-size: 12px; color: #64748b;">${new Date(item.timestamp).toLocaleString('vi-VN')}</span>
+            <span style="font-size: 20px;">${item.isCorrect ? '✅' : '⚠️'}</span>
+          </div>
+          <div style="background: #f8fafc; padding: 10px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; margin-bottom: 8px; max-height: 100px; overflow: auto;">
+${item.code}
+          </div>
+          <div style="font-size: 14px; color: #475569;">
+            <strong>Kết quả:</strong> ${item.result || 'Không có'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Event listeners
+    document.getElementById('runButton').addEventListener('click', runCode);
+    
+    document.getElementById('clearButton').addEventListener('click', () => {
+      document.getElementById('codeInput').value = '';
+      document.getElementById('output').textContent = 'Chưa có kết quả...';
+      document.getElementById('errorBox').style.display = 'none';
+    });
+
+    document.getElementById('codeInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = e.target.selectionStart;
+        const end = e.target.selectionEnd;
+        e.target.value = e.target.value.substring(0, start) + "    " + e.target.value.substring(end);
+        e.target.selectionStart = e.target.selectionEnd = start + 4;
+      }
+    });
+
+    // Example interactive calculation
+    function updateExampleCalculation() {
+      const input = document.getElementById('exampleInput');
+      const output = document.getElementById('exampleOutput');
+      const explanation = document.getElementById('exampleExplanation');
+      
+      const n = parseFloat(input.value);
+      
+      if (isNaN(n) || n <= 0) {
+        output.textContent = '---';
+        explanation.textContent = '⚠️ Vui lòng nhập số kg cam hợp lệ (lớn hơn 0)';
+        return;
+      }
+      
+      let price, rate, condition;
+      if (n > 5) {
+        price = n * 20000;
+        rate = '20,000';
+        condition = `${n} > 5`;
+      } else {
+        price = n * 25000;
+        rate = '25,000';
+        condition = `${n} ≤ 5`;
+      }
+      
+      output.textContent = price.toLocaleString('vi-VN');
+      explanation.innerHTML = `⚡ Vì <strong>${condition}</strong> nên giá = ${n} × ${rate} = <strong style="color: #10b981;">${price.toLocaleString('vi-VN')} đồng</strong>`;
+    }
+    
+    document.getElementById('exampleInput').addEventListener('input', updateExampleCalculation);
+
+    // Initialize
+    initializeSdk();
+    onConfigChange(config);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae54206b21a678e',t:'MTc2NTc5NDU0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

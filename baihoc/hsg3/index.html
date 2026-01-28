@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sliding Window Visualization</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+        body { box-sizing: border-box; }
+        .array-item { transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .window-highlight { animation: glow-pulse 1.2s ease-in-out infinite; }
+        .max-item { animation: float 2.5s ease-in-out infinite; }
+        
+        @keyframes glow-pulse {
+            0%, 100% { transform: scale(1) translateY(0); filter: drop-shadow(0 8px 30px rgba(59, 130, 246, 0.7)); }
+            50% { transform: scale(1.12) translateY(-4px); filter: drop-shadow(0 12px 40px rgba(59, 130, 246, 1)); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: scale(1.15) translateY(0) rotate(0deg); filter: drop-shadow(0 10px 35px rgba(16, 185, 129, 0.9)); }
+            50% { transform: scale(1.18) translateY(-10px) rotate(3deg); filter: drop-shadow(0 15px 45px rgba(16, 185, 129, 1)); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        .fade-in { animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        .number-circle {
+            position: relative; width: 110px; height: 110px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; font-weight: 900; color: white;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: default; text-shadow: 0 2px 8px rgba(0,0,0,0.3); letter-spacing: -1px;
+        }
+        
+        .number-circle::before {
+            content: ''; position: absolute; inset: -4px; border-radius: 50%; padding: 4px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; z-index: 0;
+        }
+        
+        .number-circle::after {
+            content: ''; position: absolute; inset: 12px; border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 70%);
+            z-index: 1; pointer-events: none;
+        }
+        
+        .number-inner { position: relative; z-index: 2; }
+        
+        .stat-card {
+            position: relative; overflow: hidden; backdrop-filter: blur(10px);
+        }
+        
+        .stat-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
+            animation: shimmer 4s infinite;
+        }
+        
+        .sparkle {
+            position: absolute; width: 6px; height: 6px; background: white;
+            border-radius: 50%; animation: sparkle 1.5s ease-in-out infinite;
+        }
+        
+        .legend-dot {
+            width: 24px; height: 24px; border-radius: 50%; display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-right: 8px; vertical-align: middle;
+        }
+  </style>
+ </head>
+ <body class="h-full">
+  <audio id="moveSound" src="di_chuyen.mp3"></audio>
+  <audio id="successSound" src="thanh_cong.mp3"></audio>
+
+  <div id="app" class="w-full h-full overflow-auto"></div>
+  <script>
+        // CẤU HÌNH MẶC ĐỊNH
+        const defaultConfig = {
+            background_color: "#0a0e27",
+            surface_color: "#1a1f3a",
+            text_color: "#e2e8f0",
+            primary_action_color: "#3b82f6",
+            secondary_action_color: "#8b5cf6",
+            font_family: "Arial",
+            font_size: 16,
+            app_title: "🎯 Mô Phỏng Sliding Window",
+            description_text: "Tìm tổng lớn nhất trong cửa sổ K phần tử liên tiếp",
+            start_button_text: "▶ Bắt Đầu Mô Phỏng",
+            next_button_text: "Bước Tiếp Theo →",
+            reset_button_text: "↻ Đặt Lại"
+        };
+
+        // Biến toàn cục
+        let currentStep = 0;
+        let array = [2, 1, 5, 1, 3, 2];
+        let k = 3;
+        let maxSum = 0;
+        let maxIndex = 0;
+        let currentSum = 0;
+        let isAnimating = false;
+
+        // Hàm phát âm thanh nội bộ
+        function playSnd(id) {
+            const audio = document.getElementById(id);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Cần tương tác người dùng"));
+            }
+        }
+
+        // Khởi tạo
+        function initializeApp() {
+            applyStyles();
+            renderApp();
+        }
+
+        function applyStyles() {
+            const config = defaultConfig;
+            document.body.style.fontFamily = `${config.font_family}, sans-serif`;
+            document.body.style.fontSize = `${config.font_size}px`;
+            document.body.style.background = config.background_color;
+            document.body.style.color = config.text_color;
+            const app = document.getElementById('app');
+            if(app) app.style.background = config.background_color;
+        }
+
+        function renderApp() {
+            const app = document.getElementById('app');
+            const config = defaultConfig;
+            
+            app.innerHTML = `
+                <div class="w-full" style="max-width: 1400px; margin: 0 auto; padding: 40px 24px;">
+                    <header style="text-align: center; margin-bottom: 56px;">
+                        <h1 id="main-title" style="font-size: 32px; font-weight: 900; margin-bottom: 16px; text-shadow: 0 2px 20px rgba(59, 130, 246, 0.4); color: ${config.text_color}">${config.app_title}</h1>
+                        <p id="description" style="font-size: 16px; opacity: 0.85; font-weight: 500; color: ${config.text_color}">${config.description_text}</p>
+                    </header>
+
+                    <div style="background: ${config.surface_color}; border-radius: 24px; padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-bottom: 32px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="margin-bottom: 40px;">
+                            <h3 style="color: ${config.text_color}; font-size: 20px; font-weight: 700; margin-bottom: 20px;">⚙️ Cài Đặt Mảng</h3>
+                            <div style="display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-end;">
+                                <div style="flex: 1; min-width: 280px;">
+                                    <label style="color: ${config.text_color}; display: block; margin-bottom: 10px; font-size: 14px; font-weight: 600;">📊 Mảng số:</label>
+                                    <input id="array-input" type="text" value="${array.join(', ')}" style="width: 100%; padding: 14px 18px; border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 12px; background: rgba(255,255,255,0.05); color: inherit; font-size: 15px; font-weight: 600;" onchange="updateArray(this.value)">
+                                </div>
+                                <div>
+                                    <label style="color: ${config.text_color}; display: block; margin-bottom: 10px; font-size: 14px; font-weight: 600;">🔢 Cửa sổ K:</label>
+                                    <input id="k-input" type="number" value="${k}" style="width: 120px; padding: 14px 18px; border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 12px; background: rgba(255,255,255,0.05); color: inherit; font-size: 15px; font-weight: 600; text-align: center;" onchange="updateK(this.value)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="visualization-area" style="margin-bottom: 40px;"></div>
+
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 32px;">
+                            <button id="start-btn" onclick="startSimulation()" style="background: ${config.primary_action_color}; padding: 12px 24px; border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;">${config.start_button_text}</button>
+                            <button id="next-btn" onclick="nextStep()" disabled style="background: ${config.primary_action_color}; padding: 12px 24px; border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; opacity: 0.4;">${config.next_button_text}</button>
+                            <button id="reset-btn" onclick="reset()" style="background: ${config.secondary_action_color}; padding: 12px 24px; border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;">${config.reset_button_text}</button>
+                        </div>
+                        <div id="explanation-area"></div>
+                    </div>
+                </div>
+            `;
+            updateVisualization();
+        }
+
+        function updateVisualization() {
+            const vizArea = document.getElementById('visualization-area');
+            const totalSteps = array.length - k + 1;
+            const windowStart = currentStep - 1;
+            const windowEnd = currentStep + k - 2;
+
+            vizArea.innerHTML = `
+                <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; padding: 20px 0;">
+                    ${array.map((num, idx) => {
+                        const inWindow = idx >= windowStart && idx <= windowEnd && currentStep > 0;
+                        const isMax = windowStart === maxIndex && inWindow && currentStep === totalSteps;
+                        
+                        let bg = inWindow ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' : 'linear-gradient(135deg, #475569, #334155)';
+                        if (isMax) bg = 'linear-gradient(135deg, #10b981, #047857)';
+
+                        return `
+                            <div class="array-item ${inWindow && !isMax ? 'window-highlight' : ''} ${isMax ? 'max-item' : ''}" style="position: relative;">
+                                <div class="number-circle" style="background: ${bg}; border: 3px solid ${inWindow ? '#60a5fa' : 'transparent'}">
+                                    <span class="number-inner">${num}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 30px;">
+                    <div class="stat-card" style="padding: 16px; border-radius: 12px; background: rgba(59,130,246,0.1); border: 2px solid rgba(59,130,246,0.3);">
+                        <div style="font-size: 11px; opacity: 0.7;">BƯỚC</div>
+                        <div style="font-size: 28px; font-weight: 900;">${currentStep}/${totalSteps}</div>
+                    </div>
+                    <div class="stat-card" style="padding: 16px; border-radius: 12px; background: rgba(139,92,246,0.1); border: 2px solid rgba(139,92,246,0.3);">
+                        <div style="font-size: 11px; opacity: 0.7;">TỔNG HIỆN TẠI</div>
+                        <div style="font-size: 28px; font-weight: 900;">${currentSum}</div>
+                    </div>
+                    <div class="stat-card" style="padding: 16px; border-radius: 12px; background: rgba(16,185,129,0.1); border: 2px solid rgba(16,185,129,0.3);">
+                        <div style="font-size: 11px; opacity: 0.7;">LỚN NHẤT</div>
+                        <div style="font-size: 28px; font-weight: 900;">${maxSum}</div>
+                    </div>
+                </div>
+            `;
+            updateExplanation();
+        }
+
+        // --- LOGIC THUẬT TOÁN KÈM ÂM THANH ---
+        function startSimulation() {
+            if (currentStep > 0) return;
+            playSnd('moveSound');
+            const firstWindow = array.slice(0, k);
+            currentSum = firstWindow.reduce((a, b) => a + b, 0);
+            maxSum = currentSum;
+            maxIndex = 0;
+            currentStep = 1;
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('start-btn').style.opacity = '0.4';
+            document.getElementById('next-btn').disabled = false;
+            document.getElementById('next-btn').style.opacity = '1';
+            updateVisualization();
+        }
+
+        function nextStep() {
+            if (isAnimating || currentStep === 0 || currentStep > array.length - k) return;
+            isAnimating = true;
+            playSnd('moveSound');
+            
+            const windowStart = currentStep;
+            const removed = array[windowStart - 1];
+            const added = array[windowStart + k - 1];
+            
+            currentSum = currentSum - removed + added;
+            if (currentSum > maxSum) {
+                maxSum = currentSum;
+                maxIndex = windowStart;
+            }
+            
+            currentStep++;
+            updateVisualization();
+            
+            if (currentStep > array.length - k) {
+                playSnd('successSound');
+                document.getElementById('next-btn').disabled = true;
+                document.getElementById('next-btn').style.opacity = '0.4';
+            }
+            setTimeout(() => { isAnimating = false; }, 600);
+        }
+
+        function reset() {
+            currentStep = 0; maxSum = 0; maxIndex = 0; currentSum = 0;
+            initializeApp();
+        }
+
+        function updateArray(v) { array = v.split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n)); reset(); }
+        function updateK(v) { k = parseInt(v); reset(); }
+        function updateExplanation() { /* Phần text giải thích giữ nguyên như của bạn... */ }
+
+        initializeApp();
+  </script>
+ </body>
+</html>

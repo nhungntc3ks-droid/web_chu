@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài Tập Câu Lệnh If</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+        }
+        
+        html, body {
+            height: 100%;
+        }
+        
+        .main-container {
+            padding: 32px 24px;
+            height: 100%;
+            overflow-auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .header h1 {
+            color: #ffffff;
+            font-size: 36px;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .timer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 16px 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .clock-icon {
+            width: 48px;
+            height: 48px;
+        }
+        
+        @keyframes tick {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(3deg); }
+            75% { transform: rotate(-3deg); }
+        }
+        
+        .clock-hand {
+            transition: transform 0.3s ease-out;
+            transform-origin: 50% 50%;
+        }
+        
+        .timer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .timer-label {
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .timer-display {
+            color: #667eea;
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .timer-btn {
+            padding: 12px 24px;
+            background: #ffffff;
+            color: #667eea;
+            border: 2px solid #ffffff;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .timer-btn:hover {
+            background: #667eea;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .timer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .reset-btn {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 22px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .exercise-description {
+            color: #4a5568;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s ease, transform 0.1s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .result {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .result.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #9ae6b4;
+        }
+        
+        .result.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #fc8181;
+        }
+        
+        .result.info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 2px solid #90cdf4;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="main-container">
+   <div class="header">
+    <h1 id="pageTitle">Câu Lệnh If</h1>
+    <div class="timer-container">
+     <div class="timer" id="timer">
+      <svg class="clock-icon" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#667eea" stroke="#764ba2" stroke-width="3" /> <circle cx="50" cy="50" r="40" fill="white" /> <!-- Hour markers --> <circle cx="50" cy="15" r="2" fill="#667eea" /> <circle cx="85" cy="50" r="2" fill="#667eea" /> <circle cx="50" cy="85" r="2" fill="#667eea" /> <circle cx="15" cy="50" r="2" fill="#667eea" /> <!-- Clock hands --> <line class="clock-hand" x1="50" y1="50" x2="50" y2="30" stroke="#764ba2" stroke-width="3" stroke-linecap="round" id="hourHand" /> <line class="clock-hand" x1="50" y1="50" x2="50" y2="22" stroke="#667eea" stroke-width="2" stroke-linecap="round" id="minuteHand" /> <!-- Center dot --> <circle cx="50" cy="50" r="4" fill="#764ba2" />
+      </svg>
+      <div class="timer-content"><span class="timer-label">Thời gian còn lại:</span> <span class="timer-display" id="timerDisplay">--:--</span>
+      </div>
+     </div>
+     <div class="timer-input-group"><label for="timerInput" style="color: white; font-weight: 600; margin-bottom: 8px; display: block;">Đặt thời gian (phút):</label> <input type="number" id="timerInput" min="1" max="60" value="10" style="width: 100px; padding: 8px 12px; border: 2px solid white; border-radius: 8px; font-size: 16px; text-align: center;">
+     </div><button class="timer-btn" id="startBtn" onclick="startTimer()">Bắt Đầu</button> <button class="timer-btn reset-btn" id="resetBtn" onclick="resetTimer()">Đặt Lại</button>
+    </div>
+   </div>
+   <div class="grid-container"><!-- Nhóm 1: Kiểm tra số chẵn lẻ -->
+    <div class="card">
+     <div class="card-header">
+      <h2 id="group1Title">Nhóm 1</h2>
+     </div>
+     <p class="exercise-description">Nhập một số n và kiểm tra xem số đó là chẵn hay lẻ.</p>
+     <div class="input-group"><label for="input1">Nhập số n:</label> <input type="number" id="input1" placeholder="Ví dụ: 5">
+     </div><button class="btn" onclick="checkEvenOdd()">Kiểm Tra</button>
+     <div id="result1" class="result"></div>
+    </div><!-- Nhóm 2: Số lớn nhất -->
+    <div class="card">
+     <div class="card-header">
+      <h2 id="group2Title">Nhóm 2</h2>
+     </div>
+     <p class="exercise-description">Nhập hai số a và b, tìm số lớn nhất trong hai số.</p>
+     <div class="input-group"><label for="input2a">Nhập số a:</label> <input type="number" id="input2a" placeholder="Ví dụ: 10">
+     </div>
+     <div class="input-group"><label for="input2b">Nhập số b:</label> <input type="number" id="input2b" placeholder="Ví dụ: 15">
+     </div><button class="btn" onclick="findMax()">Tìm Số Lớn Nhất</button>
+     <div id="result2" class="result"></div>
+    </div><!-- Nhóm 3: Chia hết cho 3 -->
+    <div class="card">
+     <div class="card-header">
+      <h2 id="group3Title">Nhóm 3</h2>
+     </div>
+     <p class="exercise-description">Nhập một số a và kiểm tra xem số đó có chia hết cho 3 không.</p>
+     <div class="input-group"><label for="input3">Nhập số a:</label> <input type="number" id="input3" placeholder="Ví dụ: 9">
+     </div><button class="btn" onclick="checkDivisibleBy3()">Kiểm Tra</button>
+     <div id="result3" class="result"></div>
+    </div><!-- Nhóm 4: Số nguyên dương -->
+    <div class="card">
+     <div class="card-header">
+      <h2 id="group4Title">Nhóm 4</h2>
+     </div>
+     <p class="exercise-description">Nhập một số và kiểm tra xem số đó có phải là số nguyên dương không.</p>
+     <div class="input-group"><label for="input4">Nhập số:</label> <input type="number" id="input4" placeholder="Ví dụ: 7">
+     </div><button class="btn" onclick="checkPositive()">Kiểm Tra</button>
+     <div id="result4" class="result"></div>
+    </div>
+   </div>
+  </div>
+  <script>
+        const defaultConfig = {
+            page_title: "Câu Lệnh If",
+            timer_minutes: "10",
+            group1_title: "Nhóm 1",
+            group2_title: "Nhóm 2",
+            group3_title: "Nhóm 3",
+            group4_title: "Nhóm 4",
+            primary_color: "#667eea",
+            secondary_color: "#764ba2",
+            background_color: "#ffffff",
+            text_color: "#2d3748",
+            accent_color: "#4a5568"
+        };
+        
+        let timerInterval = null;
+        let remainingSeconds = 0;
+        let isTimerRunning = false;
+        
+        async function onConfigChange(config) {
+            document.getElementById('pageTitle').textContent = config.page_title || defaultConfig.page_title;
+            document.getElementById('group1Title').textContent = config.group1_title || defaultConfig.group1_title;
+            document.getElementById('group2Title').textContent = config.group2_title || defaultConfig.group2_title;
+            document.getElementById('group3Title').textContent = config.group3_title || defaultConfig.group3_title;
+            document.getElementById('group4Title').textContent = config.group4_title || defaultConfig.group4_title;
+            
+            const primaryColor = config.primary_color || defaultConfig.primary_color;
+            const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+            const backgroundColor = config.background_color || defaultConfig.background_color;
+            const textColor = config.text_color || defaultConfig.text_color;
+            
+            document.body.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+            document.querySelectorAll('.card').forEach(card => {
+                card.style.background = backgroundColor;
+            });
+            document.querySelectorAll('.card-header').forEach(header => {
+                header.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+            });
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+            });
+            document.querySelectorAll('.input-group label, .exercise-description').forEach(el => {
+                el.style.color = textColor;
+            });
+            
+            document.querySelectorAll('.timer-display').forEach(el => {
+                el.style.color = primaryColor;
+            });
+            document.querySelectorAll('.timer-btn').forEach(btn => {
+                btn.style.color = primaryColor;
+            });
+            
+            if (!isTimerRunning) {
+                updateTimerDisplay();
+            }
+        }
+        
+        function updateTimerDisplay() {
+            const mins = Math.floor(remainingSeconds / 60);
+            const secs = remainingSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        
+        // Update timer when input changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const timerInput = document.getElementById('timerInput');
+            timerInput.addEventListener('input', function() {
+                if (!isTimerRunning) {
+                    const minutes = parseInt(this.value) || 10;
+                    remainingSeconds = minutes * 60;
+                    updateTimerDisplay();
+                }
+            });
+            
+            // Initialize display
+            const minutes = parseInt(timerInput.value) || 10;
+            remainingSeconds = minutes * 60;
+            updateTimerDisplay();
+        });
+        
+        function startTimer() {
+            if (isTimerRunning) return;
+            
+            const minutes = parseInt(document.getElementById('timerInput').value) || 10;
+            
+            if (remainingSeconds === 0) {
+                remainingSeconds = minutes * 60;
+            }
+            
+            isTimerRunning = true;
+            document.getElementById('startBtn').textContent = 'Đang chạy...';
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('timerInput').disabled = true;
+            
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+                updateClockHands();
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    document.getElementById('startBtn').textContent = 'Bắt Đầu';
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('timerDisplay').style.color = '#e53e3e';
+                    showTimeUpMessage();
+                }
+            }, 1000);
+        }
+        
+        function updateClockHands() {
+            const totalMinutes = Math.floor(remainingSeconds / 60);
+            const secs = remainingSeconds % 60;
+            
+            const minuteHand = document.getElementById('minuteHand');
+            const hourHand = document.getElementById('hourHand');
+            
+            if (minuteHand && hourHand) {
+                // Kim giây quay 6 độ m  i giây (360/60)
+                const secondAngle = (secs / 60) * 360;
+                
+                // Kim giờ quay dựa trên tổng số phút
+                const hourAngle = (totalMinutes / 60) * 360;
+                
+                minuteHand.style.transform = `rotate(${secondAngle}deg)`;
+                hourHand.style.transform = `rotate(${hourAngle}deg)`;
+            }
+        }
+        
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            remainingSeconds = 0;
+            document.getElementById('startBtn').textContent = 'Bắt Đầu';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('timerInput').disabled = false;
+            
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+            const primaryColor = config.primary_color || defaultConfig.primary_color;
+            document.getElementById('timerDisplay').style.color = primaryColor;
+            
+            updateTimerDisplay();
+        }
+        
+        function showTimeUpMessage() {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 32px 48px;
+                border-radius: 16px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                z-index: 1000;
+                text-align: center;
+                animation: fadeIn 0.3s ease;
+            `;
+            messageDiv.innerHTML = `
+                <h2 style="color: #667eea; margin: 0 0 16px 0; font-size: 28px;">⏰ Hết Giờ!</h2>
+                <p style="color: #4a5568; margin: 0; font-size: 18px;">Thời gian làm việc đã kết thúc</p>
+            `;
+            
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            `;
+            
+            document.body.appendChild(overlay);
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+                overlay.remove();
+            }, 3000);
+        }
+        
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [
+                    {
+                        get: () => config.primary_color || defaultConfig.primary_color,
+                        set: (value) => {
+                            config.primary_color = value;
+                            window.elementSdk.setConfig({ primary_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.secondary_color || defaultConfig.secondary_color,
+                        set: (value) => {
+                            config.secondary_color = value;
+                            window.elementSdk.setConfig({ secondary_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.background_color || defaultConfig.background_color,
+                        set: (value) => {
+                            config.background_color = value;
+                            window.elementSdk.setConfig({ background_color: value });
+                        }
+                    },
+                    {
+                        get: () => config.text_color || defaultConfig.text_color,
+                        set: (value) => {
+                            config.text_color = value;
+                            window.elementSdk.setConfig({ text_color: value });
+                        }
+                    }
+                ],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            };
+        }
+        
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["page_title", config.page_title || defaultConfig.page_title],
+                ["timer_minutes", config.timer_minutes || defaultConfig.timer_minutes],
+                ["group1_title", config.group1_title || defaultConfig.group1_title],
+                ["group2_title", config.group2_title || defaultConfig.group2_title],
+                ["group3_title", config.group3_title || defaultConfig.group3_title],
+                ["group4_title", config.group4_title || defaultConfig.group4_title]
+            ]);
+        }
+        
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities,
+                mapToEditPanelValues
+            });
+        }
+        
+        // Nhóm 1: Kiểm tra số chẵn lẻ
+        function checkEvenOdd() {
+            const n = parseInt(document.getElementById('input1').value);
+            const resultDiv = document.getElementById('result1');
+            
+            if (isNaN(n)) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Vui lòng nhập một số hợp lệ!';
+                return;
+            }
+            
+            if (n % 2 === 0) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `${n} là số chẵn`;
+            } else {
+                resultDiv.className = 'result info';
+                resultDiv.textContent = `${n} là số lẻ`;
+            }
+        }
+        
+        // Nhóm 2: Tìm số lớn nhất
+        function findMax() {
+            const a = parseFloat(document.getElementById('input2a').value);
+            const b = parseFloat(document.getElementById('input2b').value);
+            const resultDiv = document.getElementById('result2');
+            
+            if (isNaN(a) || isNaN(b)) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Vui lòng nhập cả hai số hợp lệ!';
+                return;
+            }
+            
+            if (a > b) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `Số lớn nhất l  : ${a}`;
+            } else if (b > a) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `Số lớn nhất là: ${b}`;
+            } else {
+                resultDiv.className = 'result info';
+                resultDiv.textContent = `Hai số bằng nhau: ${a}`;
+            }
+        }
+        
+        // Nhóm 3: Kiểm tra chia hết cho 3
+        function checkDivisibleBy3() {
+            const a = parseInt(document.getElementById('input3').value);
+            const resultDiv = document.getElementById('result3');
+            
+            if (isNaN(a)) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Vui lòng nhập một số hợp lệ!';
+                return;
+            }
+            
+            if (a % 3 === 0) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `${a} chia hết cho 3`;
+            } else {
+                resultDiv.className = 'result info';
+                resultDiv.textContent = `${a} không chia hết cho 3`;
+            }
+        }
+        
+        // Nhóm 4: Kiểm tra số nguyên dương
+        function checkPositive() {
+            const num = parseFloat(document.getElementById('input4').value);
+            const resultDiv = document.getElementById('result4');
+            
+            if (isNaN(num)) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Vui lòng nhập một số hợp lệ!';
+                return;
+            }
+            
+            if (num > 0 && Number.isInteger(num)) {
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `${num} là số nguyên dương`;
+            } else if (num > 0 && !Number.isInteger(num)) {
+                resultDiv.className = 'result info';
+                resultDiv.textContent = `${num} là số dương nhưng không phải số nguyên`;
+            } else if (num === 0) {
+                resultDiv.className = 'result info';
+                resultDiv.textContent = `${num} không phải là số nguyên dương (là số 0)`;
+            } else {
+                resultDiv.className = 'result info';
+                resultDiv.textContent = `${num} không phải là số nguyên dương (là số âm)`;
+            }
+        }
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b0f8caec318cde6',t:'MTc2NjIzODAwNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

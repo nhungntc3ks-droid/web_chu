@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò chơi Python: Vòng Lặp While</title>
+    <style>
+        body { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        .game-container { height: 100vh; width: 100%; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); display: flex; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; }
+        .header { text-align: center; margin-bottom: 20px; color: white; }
+        .game-title { font-size: 32px; font-weight: bold; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        
+        /* Màn hình đăng nhập */
+        .login-screen { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; max-width: 400px; width: 100%; margin-top: 50px; }
+        .login-screen h2 { color: #1e3c72; margin-bottom: 20px; }
+        
+        /* Ẩn bảng chơi lúc đầu */
+        #gameBoardWrapper { display: none; width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        .student-input { padding: 12px; border-radius: 5px; border: 1px solid #ddd; width: 90%; margin-bottom: 15px; outline: none; font-size: 16px; }
+        .game-board { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-width: 750px; width: 100%; margin-bottom: 50px; }
+        .level-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 18px; font-weight: bold; color: #1e3c72; }
+        .challenge-box { background: #f0f4f8; border-left: 5px solid #1e3c72; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .code-area { background: #2d2d2d; border-radius: 10px; padding: 20px; margin-bottom: 20px; font-family: 'Courier New', monospace; color: #f8f8f2; font-size: 16px; line-height: 1.6; }
+        .keyword { color: #ff79c6; } .variable { color: #8be9fd; } .number { color: #bd93f9; }
+        .loop-input { width: 100%; padding: 15px; font-size: 18px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: 'Courier New', monospace; margin-bottom: 20px; text-align: center; }
+        .btn { width: 100%; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; color: white; transition: 0.3s; margin-bottom: 10px; }
+        .btn-primary { background: #1e3c72; } .btn-primary:hover { background: #162e58; }
+        .btn-start { background: #28a745; } .btn-start:hover { background: #218838; }
+        .result-area { background: #fafafa; border-radius: 10px; padding: 15px; min-height: 80px; border: 1px dashed #ccc; }
+        .success-message { color: green; font-weight: bold; margin-top: 10px; }
+        .error-message { color: red; font-weight: bold; }
+        .hint-box { margin-top: 10px; padding: 10px; background: #fff3cd; color: #856404; border-radius: 5px; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+
+<main class="game-container">
+    <header class="header">
+        <h1 class="game-title">🐍 Chinh Phục While Loop</h1>
+        <p>Vượt qua 10 thử thách để nhận chứng chỉ Python!</p>
+    </header>
+
+    <div id="loginScreen" class="login-screen">
+        <h2>Thông Tin Học Sinh</h2>
+        <input type="text" id="hsName" class="student-input" placeholder="Nhập Họ và Tên...">
+        <input type="text" id="hsClass" class="student-input" placeholder="Nhập Lớp (Ví dụ: 10C1)...">
+        <button class="btn btn-start" onclick="startGame()">Bắt đầu làm bài</button>
+        <p id="loginError" style="color: red; font-size: 13px; display: none;">Vui lòng nhập đầy đủ tên và lớp!</p>
+    </div>
+
+    <div id="gameBoardWrapper" style="display: none;">
+        <div class="game-board">
+            <div class="level-info">
+                <span>Bài: <span id="currentLevel">1</span>/10</span> 
+                <span>Điểm: <span id="score">0</span>/10</span>
+            </div>
+            
+            <div class="challenge-box">
+                <div id="challengeTitle" style="font-weight:bold; margin-bottom:5px;"></div>
+                <div id="challengeDesc"></div>
+            </div>
+
+            <div class="code-area" id="codeDisplay"></div>
+            
+            <input type="text" id="loopInput" class="loop-input" placeholder="Điền vào dấu ???">
+
+            <button class="btn btn-primary" id="runBtn">🚀 Kiểm tra Code</button> 
+            
+            <div class="result-area" id="resultArea">
+                <div id="outputDisplay"></div>
+            </div>
+            <div class="hint-box" id="hintBox"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // URL Web App từ Google Apps Script của bạn
+    const LINK_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbxAQYTz6tIiDc7st3YzWL7l2m4lTV9tWbKZ1GGbG3lc-cW1GW0DALfUVcXKmFHbrbDp/exec"; 
+
+    const challenges = [
+        { title: "Bài 1", description: "Dùng 'while' để bắt đầu vòng lặp.", code: `i = 0\n??? i < 3:\n    print(i)\n    i += 1`, answer: "while", hint: "Từ khóa vòng lặp chúng ta đang học là gì?", output: "0, 1, 2" },
+        { title: "Bài 2", description: "In các số từ 1 đến 5.", code: `n = 1\nwhile n <= ???:\n    print(n)\n    n += 1`, answer: "5", hint: "Số cuối cùng cần in ra là 5.", output: "1, 2, 3, 4, 5" },
+        { title: "Bài 3", description: "Vòng lặp chạy khi x khác 0.", code: `x = 3\nwhile x ??? 0:\n    print(x)\n    x -= 1`, answer: "!=", hint: "Toán tử 'khác' trong Python là gì?", output: "3, 2, 1" },
+        { title: "Bài 4", description: "In các số chẵn: 2, 4, 6.", code: `n = 2\nwhile n <= 6:\n    print(n)\n    n = n + ???`, answer: "2", hint: "Số chẵn cách nhau mấy đơn vị?", output: "2, 4, 6" },
+        { title: "Bài 5", description: "Dùng True để tạo vòng lặp vô hạn.", code: `while ???:\n    print("Hi")\n    break`, answer: "True", hint: "Giá trị đúng (viết hoa chữ đầu) trong Python.", output: "Hi" },
+        { title: "Bài 6", description: "Tính tổng S = 1 + 2. Tăng i lên 1.", code: `S = 0; i = 1\nwhile i <= 2:\n    S += i\n    i ??? 1\nprint(S)`, answer: "+=", hint: "Cần tăng i thêm 1 sau mỗi lần lặp.", output: "3" },
+        { title: "Bài 7", description: "In các số giảm dần: 10, 5.", code: `k = 10\nwhile k >= 5:\n    print(k)\n    k -= ???`, answer: "5", hint: "10 về 5 thì bớt đi bao nhiêu?", output: "10, 5" },
+        { title: "Bài 8", description: "Thoát vòng lặp ngay lập tức.", code: `while True:\n    ???\n    print("Không in dòng này")`, answer: "break", hint: "Lệnh bẻ gãy vòng lặp.", output: "" },
+        { title: "Bài 9", description: "Chỉ in số 0.", code: `i = 0\nwhile i < ???:\n    print(i)\n    i += 1`, answer: "1", hint: "Để chỉ in 0, i phải bé hơn 1.", output: "0" },
+        { title: "Bài 10", description: "Cộng dồn vào biến S.", code: `S = 0; n = 5\nwhile n > 0:\n    S = ??? + n\n    n -= 5\nprint(S)`, answer: "S", hint: "Tổng mới = Tổng cũ + n.", output: "5" }
+    ];
+
+    let currentLevel = 0;
+    let score = 0;
+    let attempts = 0;
+
+    // Hàm bắt đầu trò chơi
+    function startGame() {
+        const ten = document.getElementById("hsName").value.trim();
+        const lop = document.getElementById("hsClass").value.trim();
+        
+        if (ten === "" || lop === "") {
+            document.getElementById("loginError").style.display = "block";
+            return;
+        }
+
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("gameBoardWrapper").style.display = "flex";
+        updateUI();
+    }
+
+    function updateUI() {
+        const c = challenges[currentLevel];
+        document.getElementById('currentLevel').textContent = currentLevel + 1;
+        document.getElementById('score').textContent = score;
+        document.getElementById('challengeTitle').textContent = c.title;
+        document.getElementById('challengeDesc').textContent = c.description;
+        document.getElementById('codeDisplay').innerHTML = c.code
+            .replace(/while|break/g, m => `<span class="keyword">${m}</span>`)
+            .replace(/True/g, `<span class="number">True</span>`)
+            .replace(/\?\?\?/g, `<span style="color:red; font-weight:bold">???</span>`)
+            .replace(/\n/g, '<br>');
+        document.getElementById('loopInput').value = '';
+        document.getElementById('outputDisplay').innerHTML = '';
+        document.getElementById('hintBox').style.display = 'none';
+        attempts = 0;
+    }
+
+    function guiDiem() {
+        const ten = document.getElementById("hsName").value;
+        const lop = document.getElementById("hsClass").value;
+        const out = document.getElementById('outputDisplay');
+
+        let danhGia = "";
+        if (score >= 9) danhGia = "Xuất sắc";
+        else if (score >= 8) danhGia = "Giỏi";
+        else if (score >= 7) danhGia = "Khá";
+        else if (score >= 5) danhGia = "Đạt";
+        else danhGia = "Chưa đạt";
+
+        out.innerHTML = `<div style="color: blue; font-weight: bold;">⏳ Đang gửi kết quả về hệ thống...</div>`;
+
+        fetch(LINK_GOOGLE_SHEET, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({
+                ten_hoc_sinh: ten,
+                lop: lop,
+                ma_bai: "Bai21_while",
+                ket_qua: score + "/10",
+                danh_gia: danhGia
+            })
+        }).then(() => {
+            alert(`Chúc mừng ${ten} - Lớp ${lop}!\nĐiểm của em là: ${score}/10\nXếp loại: ${danhGia}\nKết quả đã được lưu tự động.`);
+            out.innerHTML = `<div class="success-message">🏆 ĐÃ HOÀN THÀNH VÀ GỬI ĐIỂM!</div>`;
+            document.getElementById('runBtn').disabled = true;
+        }).catch(err => {
+            console.error("Lỗi gửi điểm:", err);
+            alert("Có lỗi khi gửi điểm, nhưng em đã hoàn thành bài thi!");
+        });
+    }
+
+    document.getElementById('runBtn').addEventListener('click', function() {
+        const input = document.getElementById('loopInput').value.trim();
+        const c = challenges[currentLevel];
+        const out = document.getElementById('outputDisplay');
+
+        if(input === c.answer) {
+            score++;
+            out.innerHTML = `<div class="success-message">✔️ Chính xác! (Kết quả: ${c.output})</div>`;
+            setTimeout(() => {
+                currentLevel++;
+                if(currentLevel < challenges.length) {
+                    updateUI();
+                } else {
+                    guiDiem(); // Tự động gửi điểm ở câu cuối
+                }
+            }, 1200);
+        } else {
+            attempts++;
+            if(attempts < 2) {
+                out.innerHTML = `<div class="error-message">❌ Sai rồi! Em còn 1 lần thử lại.</div>`;
+                document.getElementById('hintBox').style.display = 'block';
+                document.getElementById('hintBox').textContent = "💡 Gợi ý: " + c.hint;
+            } else {
+                out.innerHTML = `<div class="error-message">❌ Vẫn chưa đúng. Qua câu tiếp theo nhé.</div>`;
+                setTimeout(() => {
+                    currentLevel++;
+                    if(currentLevel < challenges.length) {
+                        updateUI();
+                    } else {
+                        guiDiem(); // Tự động gửi điểm ở câu cuối
+                    }
+                }, 1200);
+            }
+        }
+    });
+
+    // Cho phép nhấn Enter để kiểm tra
+    document.getElementById('loopInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            document.getElementById('runBtn').click();
+        }
+    });
+</script>
+</body>
+</html>
