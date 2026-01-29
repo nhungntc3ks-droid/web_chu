@@ -7,9 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { box-sizing: border-box; font-family: 'Nunito', sans-serif; overflow-x: hidden; }
-    .device-item { transition: all 0.3s ease; cursor: grab; user-select: none; touch-action: none; }
-    /* Viền Xanh/Đỏ khi nộp bài */
+    body { box-sizing: border-box; font-family: 'Nunito', sans-serif; overflow-x: hidden; margin: 0; }
+    .device-item { transition: all 0.2s ease; cursor: pointer; user-select: none; -webkit-user-select: none; }
+    .device-item:active { scale: 0.95; }
     .correct-border { border: 4px solid #22c55e !important; background-color: #f0fdf4 !important; }
     .wrong-border { border: 4px solid #ef4444 !important; background-color: #fef2f2 !important; }
     .btn-home-corner { position: fixed; top: 10px; right: 10px; z-index: 1000; background: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: #7c3aed; box-shadow: 0 2px 10px rgba(0,0,0,0.1); cursor: pointer; }
@@ -25,7 +25,7 @@
   <div id="app" class="min-h-full w-full">
     <div id="welcomePage" class="min-h-full w-full flex items-center justify-center p-4">
       <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-        <h1 class="text-3xl font-bold text-purple-600 mb-6 uppercase">Phân loại thiết bị thông minh</h1>
+        <h1 class="text-2xl font-bold text-purple-600 mb-6 uppercase">Phân loại thiết bị thông minh</h1>
         <div class="space-y-4 mb-6">
           <input type="text" id="studentName" class="w-full px-4 py-3 border-2 border-purple-100 rounded-xl outline-none" placeholder="Họ và tên">
           <input type="text" id="studentClass" class="w-full px-4 py-3 border-2 border-purple-100 rounded-xl outline-none" placeholder="Lớp">
@@ -43,9 +43,9 @@
           </div>
         </div>
 
-        <div id="dropZone" class="border-4 border-dashed border-purple-300 rounded-2xl min-h-[220px] p-4 bg-white/30 mb-4 transition-all">
-          <div id="droppedDevices" class="flex flex-wrap justify-center gap-3"></div>
-          <p id="emptyMessage" class="text-white font-bold mt-8">KÉO CÁC THIẾT BỊ THÔNG MINH VÀO ĐÂY</p>
+        <div id="dropZone" class="border-4 border-dashed border-purple-300 rounded-2xl min-h-[180px] p-4 bg-white/30 mb-4 transition-all flex flex-wrap justify-center items-center gap-3">
+          <div id="droppedDevices" class="flex flex-wrap justify-center gap-3 w-full"></div>
+          <p id="emptyMessage" class="text-white font-bold">CHẠM VÀO THIẾT BỊ THÔNG MINH ĐỂ CHỌN</p>
         </div>
 
         <div id="inventorySection" class="bg-white/90 rounded-2xl p-6 shadow-xl">
@@ -72,34 +72,56 @@
   </div>
 
   <script>
-    // ĐỦ 18 THIẾT BỊ
+    // --- CẤU HÌNH ĐỒNG BỘ VỚI APPS SCRIPT ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY8AeJbN7VsDJHaxNDACn1y0Rfasjn8godiW7r_qUDQa0ZdGFvVm57-StTkfBHJ_F0/exec";
+    const MA_BAI_HOC = "THIET_BI_THONG_MINH";
+
     const devices = [
-        { id: 1, name: "Điện thoại thông minh", emoji: "📱", isSmart: true },
+        { id: 1, name: "Điện thoại", emoji: "📱", isSmart: true },
         { id: 2, name: "Laptop", emoji: "💻", isSmart: true },
-        { id: 3, name: "Đồng hồ thông minh", emoji: "⌚", isSmart: true },
-        { id: 4, name: "Tivi thông minh", emoji: "📺", isSmart: true },
-        { id: 5, name: "Loa thông minh", emoji: "🔊", isSmart: true },
+        { id: 3, name: "Đồng hồ", emoji: "⌚", isSmart: true },
+        { id: 4, name: "Tivi", emoji: "📺", isSmart: true },
+        { id: 5, name: "Loa", emoji: "🔊", isSmart: true },
         { id: 6, name: "Máy tính bảng", emoji: "📲", isSmart: true },
         { id: 7, name: "Camera an ninh", emoji: "📷", isSmart: true },
-        { id: 8, name: "Tai nghe không dây", emoji: "🎧", isSmart: true },
-        { id: 9, name: "Máy lọc không khí", emoji: "💨", isSmart: true },
+        { id: 8, name: "Tai nghe", emoji: "🎧", isSmart: true },
+        { id: 9, name: "Máy lọc khí", emoji: "💨", isSmart: true },
         { id: 10, name: "Đèn thông minh", emoji: "💡", isSmart: true },
         { id: 11, name: "Nhà thông minh", emoji: "🏠", isSmart: true },
-        { id: 12, name: "Điện thoại cố định", emoji: "☎️", isSmart: false },
+        { id: 12, name: "Điện thoại bàn", emoji: "☎️", isSmart: false },
         { id: 13, name: "Radio", emoji: "📻", isSmart: false },
         { id: 14, name: "Bút chì", emoji: "✏️", isSmart: false },
         { id: 15, name: "Sách", emoji: "📚", isSmart: false },
         { id: 16, name: "Quạt thường", emoji: "🌀", isSmart: false },
-        { id: 17, name: "Đồng hồ báo thức", emoji: "⏰", isSmart: false },
+        { id: 17, name: "Báo thức", emoji: "⏰", isSmart: false },
         { id: 18, name: "Máy in", emoji: "🖨️", isSmart: false }
     ];
 
     let gameState = { droppedDevices: [], timeLeft: 60, timer: null, ended: false };
+    const audioCorrect = new Audio('correct.mp3');
+    const audioWrong = new Audio('wrong.mp3');
+    const audioSubmit = new Audio('submit.mp3');
 
-    // HÀM PHÁT ÂM THANH CỦA BẠN
     function playSound(f) { 
-        const audio = new Audio(f);
-        audio.play().catch(() => {}); 
+        let s = (f === 'correct.mp3') ? audioCorrect : (f === 'wrong.mp3' ? audioWrong : audioSubmit);
+        s.currentTime = 0;
+        s.play().catch(() => {}); 
+    }
+
+    function sendDataToSheet(name, className, score) {
+        const data = {
+            ten_hoc_sinh: name,
+            lop: className,
+            ma_bai: MA_BAI_HOC,
+            diem_so: score
+        };
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
     }
 
     function render() {
@@ -107,56 +129,41 @@
         const list = document.getElementById('deviceList');
         list.innerHTML = '';
         devices.forEach(d => {
-            if (gameState.droppedDevices.includes(d)) return;
+            if (gameState.droppedDevices.find(x => x.id === d.id)) return;
             const item = document.createElement('div');
-            item.className = 'device-item bg-white p-3 rounded-xl shadow-md';
-            item.innerHTML = `<div class="text-3xl">${d.emoji}</div><div class="text-[10px] font-bold uppercase">${d.name}</div>`;
-            item.draggable = true;
-            item.ondragstart = (e) => e.dataTransfer.setData('text', d.id);
-            
-            // Cảm ứng điện thoại
-            item.ontouchstart = (e) => { if(!gameState.ended) { item.style.position = 'fixed'; item.style.zIndex = '100'; }};
-            item.ontouchmove = (e) => { if(!gameState.ended) { let t = e.touches[0]; item.style.left = t.clientX - 30 + 'px'; item.style.top = t.clientY - 30 + 'px'; e.preventDefault(); }};
-            item.ontouchend = (e) => {
-                if(gameState.ended) return;
-                let t = e.changedTouches[0];
-                let r = document.getElementById('dropZone').getBoundingClientRect();
-                if (t.clientX > r.left && t.clientX < r.right && t.clientY > r.top && t.clientY < r.bottom) { doDrop(d.id); } 
-                else { render(); }
+            item.className = 'device-item bg-white p-3 rounded-xl shadow-md flex flex-col items-center justify-center';
+            item.innerHTML = `<div class="text-3xl">${d.emoji}</div><div class="text-[10px] font-bold uppercase text-center">${d.name}</div>`;
+            item.onclick = () => {
+                playSound(d.isSmart ? 'correct.mp3' : 'wrong.mp3');
+                const dz = document.getElementById('dropZone');
+                dz.classList.add(d.isSmart ? 'correct-flash' : 'wrong-flash');
+                setTimeout(()=> dz.classList.remove('correct-flash', 'wrong-flash'), 500);
+
+                gameState.droppedDevices.push(d);
+                document.getElementById('emptyMessage').style.display = 'none';
+                renderDropped();
+                render();
             };
             list.appendChild(item);
         });
     }
 
-    function doDrop(id) {
-        if (gameState.ended) return;
-        const d = devices.find(x => x.id == id);
-        if (!d || gameState.droppedDevices.includes(d)) return;
-        
-        // 1. PHÁT ÂM THANH KHI THẢ (CORRECT/WRONG)
-        playSound(d.isSmart ? 'correct.mp3' : 'wrong.mp3');
-        
-        // Hiệu ứng nháy màu DropZone
-        document.getElementById('dropZone').classList.add(d.isSmart ? 'correct-flash' : 'wrong-flash');
-        setTimeout(()=> document.getElementById('dropZone').classList.remove('correct-flash', 'wrong-flash'), 500);
-
-        gameState.droppedDevices.push(d);
-        document.getElementById('emptyMessage').style.display = 'none';
-        renderDropped();
-        render();
-    }
-
     function renderDropped() {
         const container = document.getElementById('droppedDevices');
         container.innerHTML = '';
-        gameState.droppedDevices.forEach(d => {
+        gameState.droppedDevices.forEach((d, index) => {
             const div = document.createElement('div');
-            let colorClass = 'border-purple-200';
-            if (gameState.ended) {
-                colorClass = d.isSmart ? 'correct-border' : 'wrong-border';
-            }
+            let colorClass = gameState.ended ? (d.isSmart ? 'correct-border' : 'wrong-border') : 'border-purple-200';
             div.className = `bg-white p-3 rounded-xl shadow border-2 transition-all ${colorClass}`;
             div.innerHTML = `<div class="text-2xl">${d.emoji}</div>`;
+            div.onclick = () => {
+                if(!gameState.ended) {
+                    gameState.droppedDevices.splice(index, 1);
+                    if(gameState.droppedDevices.length === 0) document.getElementById('emptyMessage').style.display = 'block';
+                    renderDropped();
+                    render();
+                }
+            };
             container.appendChild(div);
         });
     }
@@ -164,6 +171,7 @@
     document.getElementById('startButton').onclick = () => {
         let n = document.getElementById('studentName').value;
         if (!n) return alert("Nhập tên em ơi!");
+        audioCorrect.play().then(() => audioCorrect.pause());
         document.getElementById('studentDisplay').innerText = n + " - " + document.getElementById('studentClass').value;
         document.getElementById('welcomePage').classList.add('hidden');
         document.getElementById('gamePage').classList.remove('hidden');
@@ -175,39 +183,33 @@
         render();
     };
 
-    // NÚT NỘP BÀI
     document.getElementById('submitBtn').onclick = checkAnswers;
 
     function checkAnswers() {
         if (gameState.ended) return;
         gameState.ended = true;
         clearInterval(gameState.timer);
-        
-        // 2. PHÁT ÂM THANH KHI NỘP BÀI
         playSound('submit.mp3');
-
-        renderDropped(); // Để đổi màu Xanh/Đỏ
-
+        renderDropped();
         document.getElementById('inventorySection').classList.add('opacity-50', 'pointer-events-none');
         document.getElementById('submitBtn').classList.add('hidden');
         document.getElementById('showResultBtn').classList.remove('hidden');
         
         let sc = gameState.droppedDevices.filter(x => x.isSmart).length * 10;
+        if (sc > 100) sc = 100;
         document.getElementById('score').innerText = sc;
+        
+        sendDataToSheet(document.getElementById('studentName').value, document.getElementById('studentClass').value, sc);
     }
 
-    // XEM KẾT QUẢ CUỐI CÙNG
     document.getElementById('showResultBtn').onclick = () => {
-        let sc = gameState.droppedDevices.filter(x => x.isSmart).length * 10;
+        let sc = parseInt(document.getElementById('score').innerText);
         document.getElementById('gamePage').classList.add('hidden');
         document.getElementById('resultPage').classList.remove('hidden');
         document.getElementById('finalScore').innerText = sc;
         document.getElementById('stars').innerText = "⭐".repeat(sc >= 80 ? 5 : (sc >= 50 ? 3 : 1));
         document.getElementById('rating').innerText = sc >= 80 ? "XUẤT SẮC!" : "CỐ GẮNG HƠN!";
     };
-
-    document.getElementById('dropZone').ondragover = (e) => e.preventDefault();
-    document.getElementById('dropZone').ondrop = (e) => doDrop(e.dataTransfer.getData('text'));
   </script>
 </body>
 </html>
