@@ -33,11 +33,10 @@ const dataHocLieu = {
         { id: 8, tieu_de: "SÁCH GIÁO KHOA TIN 10", mo_ta: "FILE PDF CHUẨN", link: "https://sachgiaokhoa.online/...", icon: "📚", phan_loai: "Thư viện" },
         { id: 9, tieu_de: "SÁCH GIÁO KHOA TIN 11", mo_ta: "FILE PDF CHUẨN", link: "https://sachgiaokhoa.online/...", icon: "📖", phan_loai: "Thư viện" },
         { id: 10, tieu_de: "SÁCH GIÁO KHOA TIN 12", mo_ta: "FILE PDF CHUẨN", link: "https://sachgiaokhoa.online/...", icon: "📖", phan_loai: "Thư viện" },
-{ id: 11, tieu_de: "BÀI 20: CÂU LỆNH LẶP FOR", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://hoclieuso-navy.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
-{ id: 12, tieu_de: "BÀI 21: CÂU LỆNH LẶP WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://baif21-python.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
-
-{ id: 13, tieu_de: "BÀI 17: BIẾN VÀ LỆNH GÁN", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai17_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" },
-{ id: 14, tieu_de: "ÔN TẬP CÂU LỆNH WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai21_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" }
-
+        { id: 11, tieu_de: "BÀI 20: CÂU LỆNH LẶP FOR (Vercel)", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://hoclieuso-navy.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
+        { id: 12, tieu_de: "BÀI 21: CÂU LỆNH LẶP WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://baif21-python.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
+        { id: 13, tieu_de: "BÀI 17: BIẾN VÀ LỆNH GÁN", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai17_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" },
+        { id: 14, tieu_de: "ÔN TẬP CÂU LỆNH WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai21_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" }
+    
     ]
 };
