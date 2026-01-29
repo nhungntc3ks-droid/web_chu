@@ -23,7 +23,7 @@ const dataHocLieu = {
         ]
     },
     bai_hoc: [
-        { id: 1, tieu_de: "BÀI 2: VAI TRÒ CỦA THIẾT BỊ THÔNG MINH", mo_ta: "TRÒ CHƠI: ĐOÁN THIẾT BỊ THÔNG MINH.", link: "baihoc/bai2_k10/index.html", icon: "📱", phan_loai: "Lớp 10" },
+        { id: 1, tieu_de: "M2: VAI TRÒ CỦA THIẾT BỊ THÔNG MINH", mo_ta: "KIỂM TRA -ĐÁNH GIÁ.", link: "baihoc/bai2_k10/index.html", icon: "📱", phan_loai: "Lớp 10" },
         { id: 2, tieu_de: "BÀI 19: CÂU LỆNH RẼ NHÁNH IF", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai19_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" },
         { id: 3, tieu_de: "BÀI 20: CÂU LỆNH LẶP FOR", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai20_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" },
         { id: 4, tieu_de: "BÀI 5: KẾT NỐI THIẾT BỊ SỐ", mo_ta: "MÁY TÍNH VỚI XÃ HỘI TRI THỨC", link: "#", icon: "💻", phan_loai: "Lớp 11" },
@@ -33,10 +33,10 @@ const dataHocLieu = {
         { id: 8, tieu_de: "SÁCH GIÁO KHOA TIN 10", mo_ta: "FILE PDF CHUẨN", link: "https://sachgiaokhoa.online/...", icon: "📚", phan_loai: "Thư viện" },
         { id: 9, tieu_de: "SÁCH GIÁO KHOA TIN 11", mo_ta: "FILE PDF CHUẨN", link: "https://sachgiaokhoa.online/...", icon: "📖", phan_loai: "Thư viện" },
         { id: 10, tieu_de: "SÁCH GIÁO KHOA TIN 12", mo_ta: "FILE PDF CHUẨN", link: "https://sachgiaokhoa.online/...", icon: "📖", phan_loai: "Thư viện" },
-        { id: 11, tieu_de: "BÀI 20: CÂU LỆNH LẶP FOR (Vercel)", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://hoclieuso-navy.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
+        { id: 11, tieu_de: "CÂU LỆNH LẶP FOR", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://hoclieuso-navy.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
         { id: 12, tieu_de: "BÀI 21: CÂU LỆNH LẶP WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://baif21-python.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
         { id: 13, tieu_de: "BÀI 17: BIẾN VÀ LỆNH GÁN", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai17_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" },
-        { id: 14, tieu_de: "ÔN TẬP CÂU LỆNH WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai21_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" }
+        { id: 14, tieu_de: "M21:ÔN TẬP CÂU LỆNH WHILE", mo_ta: "KIỂM TRA ĐÁNH GIÁ.", link: "baihoc/bai21_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" }
     
     ]
 };
