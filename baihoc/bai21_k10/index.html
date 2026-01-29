@@ -38,9 +38,9 @@
 
     <div id="loginScreen" class="login-screen">
         <h2>Thông Tin Học Sinh</h2>
-        <input type="text" id="hsName" class="student-input" placeholder="Nhập Họ và Tên...">
-        <input type="text" id="hsClass" class="student-input" placeholder="Nhập Lớp (Ví dụ: 10C1)...">
-        <button class="btn btn-start" onclick="startGame()">Bắt đầu làm bài</button>
+        <input type="text" id="hsName" class="student-input" placeholder="Họ và tên">
+        <input type="text" id="hsClass" class="student-input" placeholder="Lớp">
+        <button id="startButton" class="btn btn-start" onclick="startGame()">BẮT ĐẦU 🚀</button>
         <p id="loginError" style="color: red; font-size: 13px; display: none;">Vui lòng nhập đầy đủ tên và lớp!</p>
     </div>
 
@@ -48,7 +48,7 @@
         <div class="game-board">
             <div class="level-info">
                 <span>Bài: <span id="currentLevel">1</span>/10</span> 
-                <span>Điểm: <span id="score">0</span>/100</span>
+                <span>Điểm: <span id="scoreVal">0</span>/100</span>
             </div>
             
             <div class="challenge-box">
@@ -71,8 +71,8 @@
 </main>
 
 <script>
-    // CẤU HÌNH ĐỒNG BỘ VỚI APPS SCRIPT
-    const LINK_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbxAQYTz6tIiDc7st3YzWL7l2m4lTV9tWbKZ1GGbG3lc-cW1GW0DALfUVcXKmFHbrbDp/exec"; 
+    // --- COPY Y HỆT CẤU HÌNH BÀI THIẾT BỊ THÔNG MINH ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY8AeJbN7VsDJHaxNDACn1y0Rfasjn8godiW7r_qUDQa0ZdGFvVm57-StTkfBHJ_F0/exec";
     const MA_BAI_HOC = "Bai21_while";
 
     const challenges = [
@@ -93,9 +93,9 @@
     let attempts = 0;
 
     function startGame() {
-        const ten = document.getElementById("hsName").value.trim();
-        const lop = document.getElementById("hsClass").value.trim();
-        if (ten === "" || lop === "") {
+        const n = document.getElementById('hsName').value.trim();
+        const l = document.getElementById('hsClass').value.trim();
+        if (!n || !l) {
             document.getElementById("loginError").style.display = "block";
             return;
         }
@@ -107,7 +107,7 @@
     function updateUI() {
         const c = challenges[currentLevel];
         document.getElementById('currentLevel').textContent = currentLevel + 1;
-        document.getElementById('score').textContent = score;
+        document.getElementById('scoreVal').textContent = score;
         document.getElementById('challengeTitle').textContent = c.title;
         document.getElementById('challengeDesc').textContent = c.description;
         document.getElementById('codeDisplay').innerHTML = c.code
@@ -121,74 +121,73 @@
         attempts = 0;
     }
 
-    function guiDiem() {
-        const ten = document.getElementById("hsName").value;
-        const lop = document.getElementById("hsClass").value;
-        const out = document.getElementById('outputDisplay');
+    // --- BÊ NGUYÊN HÀM GỬI CỦA BÀI THIẾT BỊ THÔNG MINH SANG ---
+    function sendDataToSheet(name, className, finalScore) {
+        const data = {
+            ten_hoc_sinh: name,
+            lop: className,
+            ma_bai: MA_BAI_HOC,
+            diem_so: finalScore
+        };
 
-        out.innerHTML = `<div style="color: blue; font-weight: bold;">⏳ Đang gửi kết quả về hệ thống...</div>`;
-
-        // Gửi dữ liệu khớp với biến của Apps Script bài Thiết bị thông minh
-        fetch(LINK_GOOGLE_SHEET, {
+        fetch(SCRIPT_URL, {
             method: "POST",
             mode: "no-cors",
-            body: JSON.stringify({
-                ten_hoc_sinh: ten,
-                lop: lop,
-                ma_bai: MA_BAI_HOC,
-                diem_so: score // Gửi số nguyên để Apps Script tự xếp loại
-            })
-        }).then(() => {
-            alert(`Chúc mừng ${ten} - Lớp ${lop}!\nĐiểm của em là: ${score}/100\nKết quả đã được lưu tự động.`);
-            out.innerHTML = `<div class="success-message">🏆 ĐÃ HOÀN THÀNH VÀ GỬI ĐIỂM!</div>`;
-            document.getElementById('runBtn').disabled = true;
-        }).catch(err => {
-            console.error("Lỗi gửi điểm:", err);
-            alert("Có lỗi khi gửi điểm, nhưng em đã hoàn thành bài thi!");
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
         });
     }
 
-    document.getElementById('runBtn').addEventListener('click', function() {
+    document.getElementById('runBtn').onclick = () => {
         const input = document.getElementById('loopInput').value.trim();
         const c = challenges[currentLevel];
         const out = document.getElementById('outputDisplay');
 
-        if(input === c.answer) {
-            score += 10; // Mỗi câu đúng cộng 10 điểm
-            out.innerHTML = `<div class="success-message">✔️ Chính xác! (Kết quả: ${c.output})</div>`;
+        if(input.toLowerCase() === c.answer.toLowerCase()) {
+            score += 10;
+            out.innerHTML = `<div class="success-message">✔️ Chính xác!</div>`;
             setTimeout(() => {
                 currentLevel++;
                 if(currentLevel < challenges.length) {
                     updateUI();
                 } else {
-                    guiDiem(); 
+                    finishGame();
                 }
-            }, 1200);
+            }, 1000);
         } else {
             attempts++;
             if(attempts < 2) {
-                out.innerHTML = `<div class="error-message">❌ Sai rồi! Em còn 1 lần thử lại.</div>`;
+                out.innerHTML = `<div class="error-message">❌ Sai rồi! Thử lại nhé.</div>`;
                 document.getElementById('hintBox').style.display = 'block';
                 document.getElementById('hintBox').textContent = "💡 Gợi ý: " + c.hint;
             } else {
-                out.innerHTML = `<div class="error-message">❌ Vẫn chưa đúng. Qua câu tiếp theo nhé.</div>`;
+                out.innerHTML = `<div class="error-message">❌ Câu tiếp theo.</div>`;
                 setTimeout(() => {
                     currentLevel++;
                     if(currentLevel < challenges.length) {
                         updateUI();
                     } else {
-                        guiDiem(); 
+                        finishGame();
                     }
-                }, 1200);
+                }, 1000);
             }
         }
-    });
+    };
 
-    document.getElementById('loopInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            document.getElementById('runBtn').click();
-        }
-    });
+    function finishGame() {
+        const n = document.getElementById('hsName').value;
+        const l = document.getElementById('hsClass').value;
+        const out = document.getElementById('outputDisplay');
+        
+        out.innerHTML = `<div class="success-message">🏆 HOÀN THÀNH! ĐANG LƯU ĐIỂM...</div>`;
+        document.getElementById('runBtn').disabled = true;
+
+        sendDataToSheet(n, l, score);
+        
+        setTimeout(() => {
+            alert(`Chúc mừng ${n}!\nĐiểm của em là: ${score}/100\nKết quả đã được lưu tự động.`);
+        }, 1000);
+    }
 </script>
 </body>
 </html>
