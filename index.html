@@ -2,222 +2,116 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Liệu Số - TRƯỜNG THPT KỲ SƠN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Học Liệu Số - THPT KỲ SƠN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; font-weight: 900; background-color: #f8fafc; overflow-x: hidden; }
-        * { font-style: normal !important; box-sizing: border-box; } 
+        /* Giữ Logo và Tên trường nằm ngang trên mọi thiết bị */
+        .header-content { display: flex; align-items: center; justify-content: space-between; }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu { display: none; position: absolute; background: white; z-index: 9999; border-radius: 1rem; border: 2px solid #1e40af; width: 180px; left: 50%; transform: translateX(-50%); }
         
-        /* Dropdown Mobile Fix */
-        .dropdown { position: relative; } 
-        .dropdown-menu { 
-            display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            background: white; box-shadow: 0 15px 40px rgba(0,0,0,0.2); border-radius: 1rem; 
-            width: 220px; border: 2px solid #1e40af; z-index: 9999; overflow: hidden;
-        }
-        .dropdown:hover screen and (min-width: 768px) { .dropdown-menu { display: block; } }
-        /* Hiệu ứng hover cho dropdown trên cả mobile nếu click */
-        .dropdown:focus-within .dropdown-menu, .dropdown:hover .dropdown-menu { display: block; }
-
-        .dropdown-item {
-            display: block; padding: 12px 15px; color: #1e40af; transition: all 0.2s; 
-            font-size: 0.85rem; border-bottom: 1px solid #e0e7ff; text-transform: uppercase;
-        }
-        
-        .side-btn-custom { color: #1e3a8a; font-size: 16px; border: 3px solid #e2e8f0; text-transform: uppercase; transition: 0.3s; }
-        .side-btn-custom:hover { background: #1e3a8a; color: white; border-color: #1e3a8a; }
-        
-        .intro-card { background: white; padding: 2rem; border-radius: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-top: 10px solid #ef4444; }
-        
-        /* Fix cho màn hình siêu nhỏ */
-        @media (max-width: 480px) {
-            .nav-text-h1 { font-size: 1rem !important; }
-            .nav-menu-link { font-size: 0.7rem !important; }
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 15px; }
+            .logo-area { display: flex; align-items: center; gap: 10px; }
         }
     </style>
 </head>
 <body class="text-gray-900 leading-tight">
 
-    <header class="bg-white shadow-xl sticky top-0 z-[1001]">
-        <div class="bg-blue-700 py-2 border-b text-white text-center">
-            <marquee scrollamount="8" class="uppercase font-black text-sm">TRANG HỌC LIỆU SỐ MÔN TIN HỌC - TRƯỜNG THPT KỲ SƠN !</marquee>
-        </div>
-        
-        <nav class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="renderContent('All')">
-                <img src="logo-truong.png" alt="Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain">
+    <header class="bg-white shadow-md sticky top-0 z-[1001] py-4">
+        <div class="max-w-7xl mx-auto px-4 header-content">
+            
+            <div class="logo-area flex items-center space-x-3 cursor-pointer" onclick="renderContent('All')">
+                <img src="logo-truong.png" alt="Logo" class="w-14 h-14 md:w-16 md:h-16 object-contain">
                 <div>
-                    <h1 class="nav-text-h1 text-lg md:text-xl font-black text-blue-900 uppercase leading-none">TRƯỜNG THPT KỲ SƠN</h1>
-                    <p class="text-[9px] text-gray-500 uppercase mt-1">XÃ MƯỜNG XÉN - TỈNH NGHỆ AN</p>
+                    <h1 class="text-blue-900 font-black uppercase text-base md:text-xl leading-none">THPT KỲ SƠN</h1>
+                    <p class="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Nghệ An - Mường Xén</p>
                 </div>
             </div>
 
-            <div class="flex flex-wrap justify-center items-center gap-3 md:gap-6">
-                <a href="javascript:showGioiThieu()" class="nav-menu-link text-[11px] md:text-sm uppercase text-blue-700 hover:text-blue-900 font-black">GIỚI THIỆU</a>
-                
-                <div class="dropdown">
-                    <button class="nav-menu-link text-blue-700 text-[11px] md:text-sm uppercase flex items-center font-black">
-                        PROMPT AI <span class="ml-1 text-[8px]">▼</span>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="javascript:showListContent('prompts_ai', 'tro_choi')" class="dropdown-item">🎮 MẪU TRÒ CHƠI</a>
-                        <a href="javascript:showListContent('prompts_ai', 'kiem_tra')" class="dropdown-item">📝 KIỂM TRA</a>
+            <div class="flex flex-wrap justify-center items-center gap-4 md:gap-8">
+                <a href="https://www.coze.com/store/bot/7598236198981091381" target="_blank" 
+                   class="bg-red-600 text-white px-5 py-2 rounded-xl text-xs md:text-sm uppercase font-black shadow-lg active:scale-95 transition-all">
+                   🤖 TRỢ LÝ AI
+                </a>
+
+                <div class="dropdown relative">
+                    <button class="text-blue-700 text-xs md:text-sm uppercase font-black">PROMPT ▼</button>
+                    <div class="dropdown-menu shadow-lg">
+                        <a href="javascript:showListContent('prompts_ai', 'tro_choi')" class="block p-3 text-blue-700 border-b text-xs font-black uppercase">🎮 TRÒ CHƠI</a>
+                        <a href="javascript:showListContent('prompts_ai', 'kiem_tra')" class="block p-3 text-blue-700 text-xs font-black uppercase">📝 KIỂM TRA</a>
                     </div>
                 </div>
 
-                <a href="javascript:showListContent('danh_sach_demo')" class="nav-menu-link text-[11px] md:text-sm uppercase text-blue-700 hover:text-blue-900 font-black">DEMO</a>
-                <a href="javascript:showListContent('danh_sach_video')" class="nav-menu-link text-[11px] md:text-sm uppercase text-blue-700 hover:text-blue-900 font-black">VIDEO</a>
-                <a id="btn-contact-fb" href="#" target="_blank" class="nav-menu-link text-[11px] md:text-sm uppercase text-blue-700 hover:text-blue-900 font-black">LIÊN HỆ</a>
+                <a href="javascript:showListContent('danh_sach_video')" class="text-blue-700 text-xs md:text-sm uppercase font-black">VIDEO</a>
+                <a href="https://www.facebook.com/liennnung" target="_blank" class="text-blue-700 text-xs md:text-sm uppercase font-black">FB</a>
             </div>
-        </nav>
+        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 md:py-10 grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-10">
-        <aside class="md:col-span-1 order-2 md:order-1">
-            <div class="bg-white p-5 rounded-[1.5rem] shadow-lg md:sticky md:top-40">
-                <h3 class="font-black text-blue-900 mb-4 border-l-8 border-red-600 pl-4 text-lg uppercase">DANH MỤC</h3>
-                <ul class="grid grid-cols-2 md:grid-cols-1 gap-2 md:space-y-3" id="side-menu"></ul>
+    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+        <aside class="md:col-span-1">
+            <div class="bg-white p-5 rounded-3xl shadow-md border-b-4 border-blue-100">
+                <h3 class="font-black text-blue-900 mb-4 border-l-4 border-red-600 pl-3 text-sm uppercase">DANH MỤC</h3>
+                <ul id="side-menu" class="grid grid-cols-2 md:grid-cols-1 gap-2"></ul>
             </div>
         </aside>
 
-        <section class="md:col-span-3 order-1 md:order-2">
-            <div class="flex flex-col mb-6 gap-4">
-                <div id="content-title" class="text-xl md:text-3xl font-black text-red-600 border-b-4 border-blue-100 inline-block uppercase italic-none tracking-tight">HỌC LIỆU BÀI HỌC</div>
-                
-                <div id="search-box-container" class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="searchInput" class="flex-grow p-3 rounded-xl border-2 border-gray-200 outline-none focus:border-blue-500 font-bold text-sm" placeholder="TÌM TÊN BÀI HỌC..." onkeyup="handleFilter(1)">
-                    <select id="classFilter" class="sm:w-40 p-3 rounded-xl border-2 border-gray-200 font-bold text-sm" onchange="handleFilter(1)">
-                        <option value="All">TẤT CẢ LỚP</option>
-                        <option value="Lớp 10">LỚP 10</option>
-                        <option value="Lớp 11">LỚP 11</option>
-                        <option value="Lớp 12">LỚP 12</option>
-                        <option value="HSG">HSG</option>
-                        <option value="Thư viện">THƯ VIỆN</option>
-                    </select>
-                </div>
+        <section class="md:col-span-3">
+            <div id="search-box-container" class="mb-6">
+                <input type="text" id="searchInput" class="w-full p-4 rounded-2xl border-2 border-gray-100 outline-none font-bold text-sm" placeholder="TÌM KIẾM BÀI HỌC..." onkeyup="handleFilter(1)">
             </div>
-
-            <div id="main-display" class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8"></div>
-            <div id="pagination" class="mt-8 flex flex-wrap justify-center gap-2"></div>
+            <div id="main-display" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+            <div id="pagination" class="mt-8 flex justify-center gap-2"></div>
         </section>
     </main>
 
-    <footer class="bg-[#0f172a] text-white py-10 px-6 mt-10 font-black uppercase">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-            <div>
-                <p class="text-blue-400 text-[10px] mb-2 tracking-widest">KẾT NỐI VỚI TÔI</p>
-                <a id="fb-link-footer" href="#" target="_blank" class="flex justify-center md:justify-start items-center space-x-3 text-xl hover:text-blue-400 transition">
-                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    <span>LIÊN NHUNG</span>
-                </a>
-            </div>
-            <div>
-                <p class="text-blue-400 text-[10px] mb-2 tracking-widest">SỐ ĐIỆN THOẠI / ZALO</p>
-                <p id="zalo-num" class="text-2xl tracking-tighter">0978 909 379</p>
-            </div>
-            <div>
-                <p class="text-blue-400 text-[10px] mb-2 tracking-widest">GỬI PHẢN HỒI</p>
-                <p class="text-xs text-gray-400 normal-case italic font-medium">"Hỗ trợ học liệu trực tiếp qua FB hoặc Zalo."</p>
-            </div>
-        </div>
-    </footer>
+    <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
+    <script>
+      new CozeWebSDK.WebChatClient({
+        config: {
+          bot_id: '7598236198981091381',
+        },
+        componentProps: {
+          title: 'TRỢ LÝ TIN HỌC 10',
+          zIndex: 1000,
+        },
+      });
+    </script>
 
     <script src="data.js"></script>
     <script>
-        // Giữ nguyên các hàm handleFilter, showData, showListContent, showGioiThieu của bạn
-        // Chỉ cập nhật các class render HTML để nó thân thiện với mobile
-        const display = document.getElementById('main-display');
-        const title = document.getElementById('content-title');
-        const searchBox = document.getElementById('search-box-container');
-        const pagination = document.getElementById('pagination');
-
-        window.handleFilter = function(page = 1) {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const classSelect = document.getElementById('classFilter').value;
-            const results = dataHocLieu.bai_hoc.filter(item => {
-                const matchKeyword = item.tieu_de.toLowerCase().includes(keyword) || item.mo_ta.toLowerCase().includes(keyword);
-                const matchClass = (classSelect === 'All') || (item.phan_loai === classSelect);
-                return matchKeyword && matchClass;
-            });
-            showData(results, page);
-        };
-
         function showData(dataList, page = 1) {
+            const display = document.getElementById('main-display');
             const itemsPerPage = 6;
             const items = dataList.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+            
             if (dataList.length === 0) {
-                display.innerHTML = `<p class="font-black text-gray-400 uppercase text-center w-full py-10">KHÔNG TÌM THẤY...</p>`;
-                pagination.innerHTML = ""; return;
+                display.innerHTML = `<p class="font-black text-gray-400 text-center w-full py-10">KHÔNG TÌM THẤY DỮ LIỆU</p>`;
+                return;
             }
+
             display.innerHTML = items.map(b => `
-                <div class="bg-white p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-lg border-2 border-transparent hover:border-blue-400 transition-all relative overflow-hidden group">
-                    <div class="text-4xl md:text-6xl mb-3">${b.icon}</div>
-                    <span class="absolute top-4 right-4 text-[8px] font-black bg-blue-700 text-white px-2 py-0.5 rounded-full uppercase">${b.phan_loai || 'Học liệu'}</span>
-                    <h4 class="text-lg font-black mb-2 uppercase text-gray-800">${b.tieu_de || b.ten}</h4>
-                    <p class="text-gray-500 text-xs mb-4 uppercase line-clamp-2">${b.mo_ta}</p>
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border-2 border-transparent active:border-blue-400 relative">
+                    <div class="text-5xl mb-3">${b.icon}</div>
+                    <span class="absolute top-4 right-4 text-[7px] font-black bg-blue-700 text-white px-2 py-0.5 rounded-full uppercase">${b.phan_loai}</span>
+                    <h4 class="text-base font-black mb-1 uppercase text-gray-800">${b.tieu_de}</h4>
                     <a href="${b.link}" target="_blank" class="text-red-600 border-b-2 border-red-100 font-black uppercase text-[10px] tracking-widest">TRUY CẬP →</a>
                 </div>`).join('');
-            
-            renderPagination(dataList.length, itemsPerPage, page);
         }
-
-        function renderPagination(totalItems, itemsPerPage, currentPage) {
-            pagination.innerHTML = "";
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
-            if (totalPages <= 1) return;
-            for (let i = 1; i <= totalPages; i++) {
-                pagination.innerHTML += `
-                    <button onclick="handleFilter(${i})" class="w-8 h-8 md:w-10 md:h-10 border-2 rounded-lg font-black text-xs md:text-sm ${i === currentPage ? 'bg-blue-600 text-white' : 'bg-white'}">
-                        ${i}
-                    </button>`;
-            }
-        }
-
-        window.showListContent = function(key, subKey = null) {
-            searchBox.style.display = "none";
-            let data = subKey ? dataHocLieu[key][subKey] : dataHocLieu[key];
-            title.innerText = (subKey || key).replace('_', ' ').toUpperCase();
-            display.innerHTML = data.map(item => `
-                <div class="bg-white p-6 rounded-[1.5rem] shadow-lg border-2 border-transparent hover:border-blue-400 transition-all">
-                    <div class="text-4xl mb-3">${item.icon || '📁'}</div>
-                    <h4 class="text-lg font-black mb-2 uppercase text-gray-800">${item.tieu_de || item.ten}</h4>
-                    <p class="text-gray-500 text-xs mb-4 uppercase">${item.mo_ta || 'CHI TIẾT'}</p>
-                    ${item.noi_dung_prompt ? 
-                        `<button onclick="navigator.clipboard.writeText(\`${item.noi_dung_prompt}\`)" class="bg-red-600 text-white px-4 py-2 rounded-full text-[9px] font-black w-full">SAO CHÉP PROMPT</button>` : 
-                        `<a href="${item.link}" target="_blank" class="text-red-600 border-b-2 border-red-100 font-black uppercase text-[10px]">TRUY CẬP →</a>`
-                    }
-                </div>`).join('');
-            pagination.innerHTML = "";
-        };
 
         window.renderContent = function(category) {
-            searchBox.style.display = "flex"; 
-            title.innerText = "HỌC LIỆU BÀI HỌC";
-            document.getElementById('classFilter').value = category;
-            handleFilter(1);
+            const results = category === 'All' ? dataHocLieu.bai_hoc : dataHocLieu.bai_hoc.filter(i => i.phan_loai === category);
+            showData(results);
         };
 
-        window.showGioiThieu = function() {
-            searchBox.style.display = "none"; title.innerText = "GIỚI THIỆU"; pagination.innerHTML = "";
-            display.innerHTML = `
-                <div class="intro-card uppercase text-center col-span-full">
-                    <p class="text-sm md:text-base mb-6 text-gray-700 font-black">CHÀO MỪNG QUÝ THẦY CÔ ĐẾN VỚI HỆ SINH THÁI HỌC LIỆU SỐ.</p>
-                    <div class="post-intro-image max-w-md mx-auto mb-6"><img src="anh-truong.jpg" class="rounded-xl shadow-lg w-full" onerror="this.style.display='none'"></div>
-                    <p class="text-xs text-gray-500 normal-case">Hệ thống hỗ trợ giáo viên Tin học THPT Kỳ Sơn.</p>
-                </div>`;
-        };
+        const cats = ["Lớp 10", "Lớp 11", "Lớp 12", "HSG"];
+        document.getElementById('side-menu').innerHTML = cats.map(c => `<li><button onclick="renderContent('${c}')" class="w-full text-center p-3 rounded-2xl font-black bg-white border-2 border-gray-100 text-[10px] uppercase text-blue-900">📁 ${c}</button></li>`).join('');
 
-        const cats = ["Lớp 10", "Lớp 11", "Lớp 12", "HSG", "Thư viện"];
-        document.getElementById('side-menu').innerHTML = cats.map(c => `<li><button onclick="renderContent('${c}')" class="w-full text-center md:text-left p-3 md:p-5 rounded-xl font-black side-btn-custom bg-white shadow-sm text-[10px] md:text-sm">📁 ${c}</button></li>`).join('');
-
-        document.getElementById('zalo-num').innerText = dataHocLieu.thong_tin.zalo;
-        document.getElementById('fb-link-footer').href = dataHocLieu.thong_tin.facebook_link;
-        document.getElementById('btn-contact-fb').href = dataHocLieu.thong_tin.facebook_link.replace("facebook.com", "m.me");
-
-        renderContent('All'); 
+        renderContent('All');
     </script>
 </body>
 </html>
-
