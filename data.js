@@ -6,7 +6,7 @@ const dataHocLieu = {
         link_ai_tro_ly: "https://www.coze.com/store/bot/7598236198981091381"
     },
     bai_hoc: [
-        { id: 1, tieu_de: "BÀI 1: THIẾT BỊ THÔNG MINH", mo_ta: "PHÂN LOẠI THIẾT BỊ.", link: "baihoc/bai1_k10/index.html", icon: "📱", phan_loai: "Lớp 10" },
+        { id: 1, tieu_de: "BÀI 2: THIẾT BỊ THÔNG MINH", mo_ta: "PHÂN LOẠI THIẾT BỊ.", link: "baihoc/bai2_k10/index.html", icon: "📱", phan_loai: "Lớp 10" },
         { id: 2, tieu_de: "BÀI 17: BIẾN VÀ LỆNH GÁN", mo_ta: "BÀI HỌC PYTHON.", link: "https://python-bai-17.vercel.app/", icon: "🐍", phan_loai: "Lớp 10" },
         { id: 3, tieu_de: "BÀI 21: VÒNG LẶP WHILE", mo_ta: "BÀI HỌC PYTHON.", link: "baihoc/python-while/index.html", icon: "🐍", phan_loai: "Lớp 10" },
         { id: 4, tieu_de: "BÀI 5: KẾT NỐI THIẾT BỊ SỐ", mo_ta: "MÁY TÍNH VỚI XÃ HỘI TRI THỨC", link: "#", icon: "💻", phan_loai: "Lớp 11" },
@@ -27,3 +27,4 @@ const dataHocLieu = {
     },
     danh_sach_video: [{ id: 1, tieu_de: "BÀI GIẢNG PYTHON", link: "#", icon: "🎬" }]
 };
+
