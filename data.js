@@ -37,8 +37,7 @@ const dataHocLieu = {
 { id: 12, tieu_de: "BÀI 21: CÂU LỆNH LẶP WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "https://baif21-python.vercel.app", icon: "🐍", phan_loai: "Lớp 10" },
 
 { id: 13, tieu_de: "BÀI 17: BIẾN VÀ LỆNH GÁN", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai17_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" },
-{ id: 14, tieu_de: "BÀI 21: CÂU LỆNH LẶP WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai21_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" }
-
+{ id: 14, tieu_de: "ÔN TẬP CÂU LỆNH WHILE", mo_ta: "BÀI HỌC NGÔN NGỮ PYTHON.", link: "baihoc/bai21_k10/index.html", icon: "🐍", phan_loai: "Lớp 10" }
 
     ]
 };
