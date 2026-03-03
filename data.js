@@ -1,10 +1,10 @@
-thong_tin: {
-    ten_truong: "THPT KỲ SƠN",
-    zalo: "0978 909 379",
-    facebook_link: "https://www.facebook.com/dungcot09090",
-    // Dùng đúng cái link ngắn này, không được thừa một dấu cách nào cô nhé:
-    link_ai_tro_ly: "https://www.coze.com/s/Zs8BaE6Cj/"
-},
+const dataHocLieu = {
+    thong_tin: {
+        ten_truong: "THPT KỲ SƠN",
+        zalo: "0978 909 379",
+        facebook_link: "https://www.facebook.com/dungcot09090",
+        link_ai_tro_ly: "https://www.coze.com/s/Zs8BaE6Cj/"
+    },
     bai_hoc: [
         { id: 1, tieu_de: "BÀI 2: THIẾT BỊ THÔNG MINH", mo_ta: "PHÂN LOẠI THIẾT BỊ.", link: "baihoc/bai2_k10/index.html", icon: "📱", phan_loai: "Lớp 10" },
         { id: 2, tieu_de: "BÀI 17: BIẾN VÀ LỆNH GÁN", mo_ta: "BÀI HỌC PYTHON.", link: "https://python-bai-17.vercel.app/", icon: "🐍", phan_loai: "Lớp 10" },
@@ -27,8 +27,3 @@ thong_tin: {
     },
     danh_sach_video: [{ id: 1, tieu_de: "BÀI GIẢNG PYTHON", link: "#", icon: "🎬" }]
 };
-
-
-
-
-
